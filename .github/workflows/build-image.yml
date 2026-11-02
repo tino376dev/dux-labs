@@ -37,7 +37,7 @@ env:
   DEFAULT_TAG: "stable"
   PRODUCTION_BRANCH: "stable" # The branch that publishes :stable production images
   REGISTRY_CACHE_WRITE: "1" # CI always writes the layer cache; local builds stay read-only
-  ENABLE_RECHUNKING: "false"
+  ENABLE_RECHUNKING: "true"
   RECHUNK_MAX_LAYERS: "128"
 
 concurrency:
