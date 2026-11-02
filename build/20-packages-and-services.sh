@@ -26,6 +26,12 @@ shopt -s nullglob
 
 echo "::group:: Install Default Packages"
 
+if rpm -q firefox >/dev/null 2>&1; then
+	echo "::group:: Remove base-provided browser"
+	dnf5 remove -y firefox
+	echo "::endgroup::"
+fi
+
 dnf5 install -y just gum fzf jq
 
 echo "::endgroup::"

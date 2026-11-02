@@ -5,7 +5,7 @@
 # installs and the boundary around it: filesystem overlays and their units
 # belong to 10-overlay.sh. The script sources /ctx/build/copr-helpers.sh, so
 # each test rewrites a throwaway copy to point at a sandbox context and stubs
-# dnf5, systemctl and rsync.
+# rpm, dnf5, systemctl and rsync.
 #
 # Run with: bats tests/template/20-packages-and-services_test.bats
 
@@ -44,6 +44,12 @@ exit 0
 EOF
 		chmod +x "${STUB_BIN}/${tool}"
 	done
+
+	cat >"${STUB_BIN}/rpm" <<'EOF'
+#!/usr/bin/bash
+[[ "${1:-}" == "-q" && "${2:-}" == "firefox" && "${FIREFOX_INSTALLED:-0}" == "1" ]]
+EOF
+	chmod +x "${STUB_BIN}/rpm"
 }
 
 teardown() {
@@ -79,6 +85,15 @@ teardown() {
 
 	mapfile -t calls <"${DNF5_LOG}"
 	[ "${calls[0]}" = "install -y just gum fzf jq" ]
+}
+
+@test "20-packages-and-services: removes Firefox from the base when installed" {
+	FIREFOX_INSTALLED=1 run bash "${SCRIPT}"
+	[ "$status" -eq 0 ]
+
+	mapfile -t calls <"${DNF5_LOG}"
+	[ "${calls[0]}" = "remove -y firefox" ]
+	[ "${calls[1]}" = "install -y just gum fzf jq" ]
 }
 
 @test "20-packages-and-services: installs uupd from its COPR in isolation" {

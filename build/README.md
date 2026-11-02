@@ -11,6 +11,7 @@ prefix auto-discovery. The numbers communicate intent.
 | `00-image-info.sh` | Writes the image identity into `os-release` and `image-info.json`: the base image name, the Fedora major derived from the base's `os-release`, the version string, and the tag. |
 | `10-overlay.sh` | Overlays `projectbluefin/common`'s shared layer and the Brew integration, copies this template's declarations (Brewfiles, ujust recipes, Flatpak preinstalls, `/etc/skel` seeds), and enables the units that consume them. Installs no packages. |
 | `20-packages-and-services.sh` | Installs the default RPM and COPR packages and enables their services. Packages live here, not in the overlay phase, so an overlay edit cannot invalidate the package layer. |
+| `30-native-apps.sh` | Installs the native Edge, Zen Browser, and VS Code RPMs. Their RPM metadata lets the rechunker identify each app as a package component. |
 | `90-cleanup.sh` | Finalises package and Flatpak sources, prunes build artifacts, and prepares for `bootc container lint`. |
 
 Helpers, not phases: `copr-helpers.sh` (sourced), `validate-brewfiles.sh`, and

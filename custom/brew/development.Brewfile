@@ -1,5 +1,5 @@
 # Brewfile for development tools
-# Uncomment packages you want to install
+# Install via: ujust install-dev-tools
 
 # Container and orchestration tools
 # brew "kind"           # Kubernetes in Docker
@@ -8,10 +8,21 @@
 # brew "helm"           # Kubernetes package manager
 
 # Cloud tools
-# brew "awscli"         # AWS CLI
-# brew "azure-cli"      # Azure CLI
+brew "azure-cli"
+brew "databricks"
 
-# Programming languages and tools
+# Editors, language tools, and formatters
+brew "gcc"
+brew "markdown-oxide"
+brew "marksman"
+brew "openfortivpn"
+brew "ruff"
+brew "tinymist"
+brew "topiary"
+brew "typst"
+
+# Add other development tools as needed.
+# brew "awscli"         # AWS CLI
 # brew "go"             # Go programming language
 # brew "node"           # Node.js
 # brew "python@3.12"    # Python
