@@ -62,6 +62,9 @@ teardown() {
 	[[ "$(<"${DNF5_LOG}")" == *"xdg-desktop-portal-gtk"* ]]
 	[[ "$(<"${DNF5_LOG}")" == *"gvfs"* ]]
 	[[ "$(<"${DNF5_LOG}")" == *"udisks2"* ]]
+	for package in accountsservice bubblewrap cava ffmpeg-free ffmpegthumbnailer glycin-thumbnailer i2c-tools libgsf poppler-utils qt6-qtpdf qt6-qtmultimedia; do
+		[[ "$(<"${DNF5_LOG}")" == *"${package}"* ]]
+	done
 	[[ "$(<"${REPO_ROOT}/custom/files/usr/share/applications/mimeapps.list")" == *"inode/directory=dev.duxlabs.files.desktop;"* ]]
 	mapfile -t calls <"${SYSTEMCTL_LOG}"
 	[ "${calls[0]}" = "enable greetd.service" ]

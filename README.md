@@ -48,6 +48,10 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 - Dux Files is the default application for opening directories. Its open/save
   chooser is available to portal-using applications but is not enabled by
   default. Opt in per user in Dux Files Settings or run `dfiles portal install`.
+- Optional RPM integrations add sandboxed thumbnails for common video, PDF,
+  HEIF/AVIF/JXL, and Office files; PDF previews; DMS audio visualization and
+  sound feedback; persistent profile details; and DDC monitor brightness
+  controls. Video support depends on Fedora's available codecs.
 
 ## Quick start
 

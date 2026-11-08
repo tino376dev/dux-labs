@@ -35,12 +35,23 @@ echo "::endgroup::"
 echo "::group:: Install desktop integration"
 dnf5 install -y \
 	alacritty \
+	accountsservice \
 	brightnessctl \
+	bubblewrap \
+	cava \
+	ffmpeg-free \
+	ffmpegthumbnailer \
 	greetd \
+	glycin-thumbnailer \
 	gvfs \
 	gnome-keyring \
 	gnome-keyring-pam \
+	i2c-tools \
+	libgsf \
+	poppler-utils \
 	power-profiles-daemon \
+	qt6-qtpdf \
+	qt6-qtmultimedia \
 	qt6-qtimageformats \
 	udisks2 \
 	xdg-desktop-portal \
