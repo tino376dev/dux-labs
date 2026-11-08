@@ -12,6 +12,12 @@ prefix auto-discovery. The numbers communicate intent.
 | `10-overlay.sh` | Overlays `projectbluefin/common`'s shared layer and the Brew integration, copies this template's declarations (Brewfiles, ujust recipes, Flatpak preinstalls, `/etc/skel` seeds), and enables the units that consume them. Installs no packages. |
 | `20-packages-and-services.sh` | Installs the default RPM and COPR packages and enables their services. Packages live here, not in the overlay phase, so an overlay edit cannot invalidate the package layer. |
 | `30-native-apps.sh` | Installs the native Edge, Zen Browser, and VS Code RPMs. Their RPM metadata lets the rechunker identify each app as a package component. |
+| `40-niri-dms.sh` | Installs Niri, the Dux Modular Shell stack, and Dux Files as the default folder manager, plus greetd, portals, and desktop support packages. |
+
+Dux Files' open/save portal chooser is available but remains a per-user opt-in:
+enable it in Settings → General → Use Dux Files for open and save dialogs, or
+run `dfiles portal install`. The existing portal backends stay installed for
+other portal interfaces.
 | `90-cleanup.sh` | Finalises package and Flatpak sources, prunes build artifacts, and prepares for `bootc container lint`. |
 
 Helpers, not phases: `copr-helpers.sh` (sourced), `validate-brewfiles.sh`, and

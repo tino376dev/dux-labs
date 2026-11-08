@@ -152,10 +152,32 @@ build $target_image=IMAGE_NAME $tag=DEFAULT_TAG:
     base_from=$(grep -iE '^FROM[[:space:]]' Containerfile | grep -viE '[[:space:]]as[[:space:]]' | head -n1)
     base_tag=$(sed -E 's|^FROM[[:space:]]+[^@:[:space:]]*:([^@[:space:]]+)(@.*)?$|\1|' <<<"${base_from}")
     base_ref=$(sed -E 's|^FROM[[:space:]]+||; s|@.*$||; s|:[^:/]*$||' <<<"${base_from}")
+    base_image_ref=$(sed -E 's|^FROM[[:space:]]+||' <<<"${base_from}")
     base_image_name="${base_ref##*/}"
     if [[ -z "${base_from}" || "${base_tag}" == "${base_from}" || -z "${base_image_name}" ]]; then
         echo "ERROR: Could not read the base image from the Containerfile base FROM line"
         exit 1
+    fi
+
+    # base-nvidia's rolling `latest` tag follows Fedora majors. Resolve the
+    # major from the version label on the same pinned manifest used by the build.
+    if [[ "${base_image_name}" == "base-nvidia" && "${base_tag}" == "latest" ]]; then
+        base_digest="${base_image_ref##*@}"
+        if [[ "${base_digest}" == "${base_image_ref}" || ! "${base_digest}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "ERROR: base-nvidia:latest must be pinned by digest to resolve its Fedora version"
+            exit 1
+        fi
+        if ! command -v skopeo &>/dev/null; then
+            echo "ERROR: skopeo is required to resolve the base-nvidia Fedora version"
+            exit 1
+        fi
+        base_version=$(skopeo inspect --config "docker://${base_ref}@${base_digest}" | jq -r '.config.Labels["org.opencontainers.image.version"] // empty')
+        base_major="${base_version%%.*}"
+        if [[ ! "${base_major}" =~ ^[0-9]+$ ]]; then
+            echo "ERROR: Could not resolve a Fedora major from base-nvidia version '${base_version}'"
+            exit 1
+        fi
+        base_tag="${base_major}"
     fi
 
     # Image identity, resolved once: an explicit IMAGE_VENDOR wins, otherwise

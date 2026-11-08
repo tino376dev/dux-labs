@@ -12,6 +12,18 @@
 # App IDs are listed at https://flathub.org/ and verified by
 # `just validate-flatpaks` before a change can land.
 
+# Local-first, plain-text knowledge base.
+[Flatpak Preinstall com.logseq.Logseq]
+Branch=stable
+
+# Remote desktop client for RDP, VNC, SSH and other protocols.
+[Flatpak Preinstall org.remmina.Remmina]
+Branch=stable
+
+# The Flathub package is community-maintained and not endorsed by Signal.
+[Flatpak Preinstall org.signal.Signal]
+Branch=stable
+
 # Email, calendar and newsgroup client. Fedora ships no mail client by default.
 [Flatpak Preinstall org.mozilla.Thunderbird]
 Branch=stable

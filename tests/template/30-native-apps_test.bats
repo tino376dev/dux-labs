@@ -35,19 +35,7 @@ if [[ "${1:-}" == "-E" && "${2:-}" == "%fedora" ]]; then
 fi
 exit 0
 EOF
-	cat >"${STUB_BIN}/curl" <<'EOF'
-#!/usr/bin/bash
-while (($#)); do
-	if [[ "$1" == "-o" ]]; then
-		shift
-		printf '[terra]\n' >"$1"
-		exit 0
-	fi
-	shift
-done
-exit 1
-EOF
-	chmod +x "${STUB_BIN}/curl" "${STUB_BIN}/dnf5" "${STUB_BIN}/rpm"
+	chmod +x "${STUB_BIN}/dnf5" "${STUB_BIN}/rpm"
 }
 
 teardown() {
@@ -62,8 +50,10 @@ teardown() {
 	[ "${calls[0]}" = "-y copr enable scottames/zen-browser" ]
 	[ "${calls[1]}" = "-y copr disable scottames/zen-browser" ]
 	[ "${calls[2]}" = "-y install --enablerepo=copr:copr.fedorainfracloud.org:scottames:zen-browser zen-browser" ]
-	[ "${calls[3]}" = "install -y zed" ]
-	[ "${calls[4]}" = "install -y microsoft-edge-stable code" ]
+	[ "${calls[3]}" = "install -y --nogpgcheck --repofrompath terra,https://repos.fyralabs.com/terra44 terra-release terra-gpg-keys" ]
+	[ "${calls[4]}" = "install -y zed" ]
+	[ "${calls[5]}" = "config-manager setopt terra.enabled=0" ]
+	[ "${calls[6]}" = "install -y microsoft-edge-stable code" ]
 }
 
 @test "30-native-apps: verifies Microsoft RPMs and removes temporary repos" {
@@ -71,7 +61,6 @@ teardown() {
 	[ "${status}" -eq 0 ]
 
 	grep -Fx -- "--import https://packages.microsoft.com/keys/microsoft.asc" "${RPM_LOG}"
-	[ ! -e "${NATIVE_APPS_REPO_DIR}/terra.repo" ]
 	[ ! -e "${NATIVE_APPS_REPO_DIR}/microsoft-edge.repo" ]
 	[ ! -e "${NATIVE_APPS_REPO_DIR}/vscode.repo" ]
 }

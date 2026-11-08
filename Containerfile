@@ -25,7 +25,7 @@
 #    - @ublue-os/brew - Homebrew integration
 #
 # 2. Base Image Options (edit the FROM line below):
-#    - `quay.io/fedora-ostree-desktops/silverblue` (Fedora, GNOME desktop)
+#    - `ghcr.io/ublue-os/base-nvidia` (Fedora, NVIDIA drivers, no GNOME desktop)
 #    - `quay.io/fedora-ostree-desktops/base-main` (Fedora, no desktop)
 #    - `quay.io/centos-bootc/centos-bootc:stream10` (CentOS-based)
 #    - `quay.io/hummingbird-community/bootc-os` (Hummingbird-based, minimal)
@@ -48,9 +48,10 @@ COPY custom /custom
 COPY --from=common /system_files /oci/common
 COPY --from=brew /system_files /oci/brew
 
-# Base Image - GNOME included (Fedora official OSTree desktop)
-# Renovate will keep the digest pin up to date.
-FROM quay.io/fedora-ostree-desktops/silverblue:44@sha256:e6a514d1c6c243371aa41d96e4c179d729d8996660ae5035294be32397367fa6
+# Base Image - Fedora's NVIDIA-enabled base, following the rolling Fedora release.
+# Renovate keeps the digest pinned; the build recipe derives the Fedora major
+# from the version label on this exact manifest.
+FROM ghcr.io/ublue-os/base-nvidia:latest@sha256:6b15c82b94bb93c00005207c5e612b417b5710670f16f7c8b5ebf37cf46c401f
 
 # Image identity - these define how bootc, fastfetch, and the ublue ecosystem
 # recognize your image. Change these to match your project name.
@@ -111,6 +112,13 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build/30-native-apps.sh
+
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=tmpfs,dst=/boot \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/40-niri-dms.sh
 
 ### CLEANUP
 ## Finalises package and Flatpak sources, then prunes build artifacts before

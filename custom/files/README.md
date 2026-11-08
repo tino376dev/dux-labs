@@ -9,3 +9,7 @@ tmpfiles.d and sysusers.d entries, and other system payloads the template ships.
 
 `custom/config/` is the seam for new-user configuration instead. The `customize`
 skill decides which seam a given file belongs in.
+
+`usr/share/applications/mimeapps.list` makes Dux Files the system default for
+opening directories. Its open/save portal chooser is opt-in per user through
+Dux Files Settings or `dfiles portal install`.

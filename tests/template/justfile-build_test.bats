@@ -43,6 +43,8 @@ setup() {
     export STUB_SKOPEO_TAGS='{"Tags":[]}'
     # Exit status of `skopeo list-tags`; non-zero disables the layer cache.
     export STUB_SKOPEO_STATUS=0
+    # OCI config returned when the recipe inspects a floating base image.
+    export STUB_SKOPEO_CONFIG='{"config":{"Labels":{"org.opencontainers.image.version":"44.20260830"}}}'
     # Porcelain output of `git status -s`; empty means a clean worktree.
     export STUB_GIT_STATUS=""
     # JSON `podman inspect` returns; the recipe reads .[].Id out of it.
@@ -64,7 +66,11 @@ if [[ "${STUB_SKOPEO_STATUS:-0}" -ne 0 ]]; then
     echo "skopeo: stub failure" >&2
     exit "${STUB_SKOPEO_STATUS}"
 fi
-printf '%s\n' "${STUB_SKOPEO_TAGS}"
+if [[ "$1" == "inspect" && "$2" == "--config" ]]; then
+    printf '%s\n' "${STUB_SKOPEO_CONFIG}"
+else
+    printf '%s\n' "${STUB_SKOPEO_TAGS}"
+fi
 EOF
 
     cat >"${STUB_BIN}/git" <<'EOF'
@@ -131,6 +137,16 @@ podman_build_args() {
     run_just build finpilot stable
     [ "$status" -eq 0 ]
     [[ "$(podman_build_args)" == *"--build-arg VERSION=45.20260830"* ]]
+}
+
+@test "build: resolves Fedora major from a pinned rolling base-nvidia tag" {
+    local digest="sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    printf 'FROM ghcr.io/ublue-os/base-nvidia:latest@%s\n' "${digest}" >"${SANDBOX}/Containerfile"
+    run_just build finpilot stable
+    [ "$status" -eq 0 ]
+    [[ "$(podman_build_args)" == *"--build-arg VERSION=44.20260830"* ]]
+    [[ "$(podman_build_args)" == *"--build-arg BASE_IMAGE_NAME=base-nvidia"* ]]
+    grep -Fx "inspect --config docker://ghcr.io/ublue-os/base-nvidia@${digest}" "${SKOPEO_LOG}"
 }
 
 @test "build: accepts a base FROM line without a digest" {

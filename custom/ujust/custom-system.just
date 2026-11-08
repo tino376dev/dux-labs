@@ -8,6 +8,16 @@
 ## user configuration or change group membership. These recipes are the
 ## explicit, user-invoked way to do both.
 
+# Generate this user's Niri configuration and start the DMS session services.
+[group('Desktop')]
+setup-niri-dms:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    dms setup
+    niri validate
+    systemctl --user restart dms.service dsearch.service
+
 # Add the current user to the docker and libvirt groups, creating them if needed.
 [group('System')]
 configure-dev-groups:

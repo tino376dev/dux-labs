@@ -19,11 +19,12 @@ These hold for every change:
 ## Branches and releases
 
 `main` is the testing branch: pushes publish `:stable-testing`. `stable` is
-production, and it never rebuilds — `execute-release.yml` promotes the exact
-digest `main` already built. Promotion is `main` → `stable` through the
-auto-opened squash PR, and `stable` hotfixes sync back to `main`. `stable` takes
-no direct commits. The README owns the release table and the promotion gate's
-current limits.
+production, and it never rebuilds — `execute-release.yml` promotes the digest
+currently at `:testing` after signature verification. The promotion gate does
+not bind that digest to the exact commit being promoted; see the README's
+release limitations. Promotion is `main` → `stable` through the auto-opened
+squash PR, and `stable` hotfixes sync back to `main`. `stable` takes no direct
+commits. The README owns the release table and current gate limits.
 
 ## Pull request comments
 
@@ -44,6 +45,12 @@ Ship the work and update the owning skill in the same PR, not a follow-up. A
 skill is the home for durable learning; a changelog, a session note, or an
 "append here" section is not. When a workaround or convention surprised you,
 the next agent needs it.
+
+## Desktop
+
+- The image uses the rolling, digest-pinned [`base-nvidia`](https://github.com/ublue-os/hwe/pkgs/container/base-nvidia/versions?filters%5Bversion_type%5D=tagged) image. `latest` follows the current Fedora major; `stable` can lag. `just build` derives its Fedora version from the pinned image's OCI version label.
+- Niri is a compositor, not a complete desktop. Follow its [integration](https://niri-wm.github.io/niri/Integrating-niri.html), [portal](https://niri-wm.github.io/niri/Important-Software.html), and [NVIDIA](https://niri-wm.github.io/niri/Nvidia.html) guidance when changing session startup, portals, or driver settings.
+- Use the [DMS installation](https://duxlabs.dev/docs/dms/installation) and [compositor setup](https://duxlabs.dev/docs/dms/compositors) docs for configuration guidance. DMS packages come from the [Dux Labs DMS](https://copr.fedorainfracloud.org/coprs/duxlabs/dms/) and [Dux repository](https://copr.fedorainfracloud.org/coprs/duxlabs/dux-repo/) COPRs; development builds use [Dux Labs DMS Git](https://copr.fedorainfracloud.org/coprs/duxlabs/dms-git/). Existing installations from AvengeMedia COPRs migrate with `dms migrate dux`. Niri packages come from [yalter/niri](https://copr.fedorainfracloud.org/coprs/yalter/niri/).
 
 ## Ownership
 

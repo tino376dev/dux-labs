@@ -1,0 +1,5 @@
+# PAM configuration for greetd-spawn.
+auth       include      greetd
+account    include      greetd
+session    required     pam_env.so conffile=/usr/share/greetd/greetd-spawn.pam_env.conf
+session    include      greetd

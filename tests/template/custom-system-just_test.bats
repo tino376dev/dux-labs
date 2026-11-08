@@ -102,6 +102,26 @@ _run_recipe() {
     grep -qF "sudo usermod --append --groups docker,libvirt tester" "${COMMAND_LOG}"
 }
 
+@test "setup-niri-dms configures Niri and restarts the DMS session services" {
+    _write_mock "dms" <<'MOCK'
+#!/usr/bin/bash
+echo "dms $*" >> "${COMMAND_LOG}"
+MOCK
+    _write_mock "niri" <<'MOCK'
+#!/usr/bin/bash
+echo "niri $*" >> "${COMMAND_LOG}"
+MOCK
+    _write_mock "systemctl" <<'MOCK'
+#!/usr/bin/bash
+echo "systemctl $*" >> "${COMMAND_LOG}"
+MOCK
+
+    _run_recipe "setup-niri-dms"
+
+    [ "${status}" -eq 0 ]
+    [ "$(cat "${COMMAND_LOG}")" = $'dms setup\nniri validate\nsystemctl --user restart dms.service dsearch.service' ]
+}
+
 @test "configure-dev-groups does not recreate groups that already exist" {
     _run_recipe "configure-dev-groups" MOCK_GETENT_STATUS=0 MOCK_GROUPS="tester wheel"
 

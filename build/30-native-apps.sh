@@ -28,12 +28,11 @@ copr_install_isolated "scottames/zen-browser" zen-browser
 echo "::endgroup::"
 
 echo "::group:: Install Zed"
-terra_repo_file="${NATIVE_APPS_REPO_DIR}/terra.repo"
-curl -fsSL \
-	"https://raw.githubusercontent.com/terrapkg/packages/f${FEDORA_MAJOR}/anda/terra/release/terra.repo" \
-	-o "${terra_repo_file}"
+dnf5 install -y --nogpgcheck \
+	--repofrompath "terra,https://repos.fyralabs.com/terra${FEDORA_MAJOR}" \
+	terra-release terra-gpg-keys
 dnf5 install -y zed
-rm -f "${terra_repo_file}"
+dnf5 config-manager setopt terra.enabled=0
 echo "::endgroup::"
 
 echo "::group:: Install Microsoft Edge and VS Code"

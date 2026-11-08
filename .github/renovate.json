@@ -38,6 +38,7 @@
       "matchDepNames": [
         "ghcr.io/projectbluefin/common",
         "ghcr.io/ublue-os/brew",
+        "ghcr.io/ublue-os/base-nvidia",
         "quay.io/fedora-ostree-desktops/*",
         "quay.io/centos-bootc/*",
         "quay.io/hummingbird-community/*"

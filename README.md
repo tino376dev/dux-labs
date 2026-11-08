@@ -10,34 +10,44 @@ It is built to be driven by hand or by an agent.
 
 > Be the one who moves, not the one who is moved.
 
-## What Makes this Raptor Different?
+## Image Differences
 
-Here are the changes from [Base Image Name]. This image is based on
-[Bluefin/Bazzite/Aurora/etc] and includes these customizations:
+The default image is based on Fedora's `ghcr.io/ublue-os/base-nvidia` bootc
+image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 
-### Added Packages (Build-time)
+### Build-time packages and applications
 
-- List the packages you install at build time
+- Niri, Dux Modular Shell, Dux Greeter, Dux Files, Dux Search, Dux GOP, Dux
+  Calendar, Quickshell, Matugen, and the desktop integration packages they use.
+- `just`, `gum`, `fzf`, `jq`, and `uupd` with its scheduled update timers.
+- Native RPM applications: Microsoft Edge, Zen Browser, Zed, and Visual Studio
+  Code.
 
-### Added Applications (Runtime)
+### Optional applications
 
-- **CLI tools (Homebrew)**: list them
-- **GUI apps (Flatpak)**: list them
+- **Homebrew defaults:** bat, carapace, dust, eza, fd, fish, gh, git-delta,
+  glow, helix, micro, numbat, nushell, podman-compose, ripgrep, starship,
+  vivid, yazi, and zoxide. Install with `ujust install-default-apps`.
+- **Homebrew development tools:** azure-cli, databricks, gcc, markdown-oxide,
+  marksman, openfortivpn, ruff, tinymist, topiary, and typst. Install with
+  `ujust install-dev-tools`.
+- **Flatpaks installed on first boot:** Logseq, Remmina, Signal, Thunderbird,
+  Flatseal, and Extension Manager.
 
-### Removed or Disabled
+### Removed or disabled
 
-- List anything removed from the base image
+- Firefox is removed when it is present in the base image.
+- Third-party package repositories are disabled after image assembly.
 
-### Configuration Changes
+### Desktop configuration
 
-- Systemd services enabled or disabled
-- Desktop environment changes
-- Other notable modifications
-
-_Last updated: [date]_
-
-> This section is what tells your users how your image differs from its base.
-> Update it whenever you add or remove a package, app, or service.
+- greetd starts Dux Greeter with Niri. PAM integrates GNOME Keyring so a
+  password login can unlock the user's login keyring when its password matches.
+- Dux Modular Shell and Dux Search start with Niri rather than in other desktop
+  sessions. Power profile and system update services are enabled.
+- Dux Files is the default application for opening directories. Its open/save
+  chooser is available to portal-using applications but is not enabled by
+  default. Opt in per user in Dux Files Settings or run `dfiles portal install`.
 
 ## Quick start
 
@@ -78,10 +88,10 @@ _Last updated: [date]_
 
 ## Customize
 
-Pick your base image on the `Containerfile`'s `FROM` line; the template defaults
-to Fedora Silverblue. That line is the only place the base is chosen: `just build`
-reads the image name and the tag from it, and the Fedora major comes from the
-base image itself during the build.
+Pick your base image on the `Containerfile`'s `FROM` line; this repository
+defaults to Fedora's `ghcr.io/ublue-os/base-nvidia`. That line is the only place
+the base is chosen: `just build` reads the image name and tag from it, and the
+Fedora major comes from the base image itself during the build.
 
 Then add to your image:
 
@@ -105,9 +115,12 @@ publishes `:stable` when merged. Promotion verifies the cosign signature on the
 testing image before it reports ready, and refuses to promote at all once `main`
 has moved past the commit the promotion PR was built from.
 
-> **Known gap:** the promotion gate checks the digest and the signature only. It
-> runs no end-to-end tests, so `release/ready` means "signed and unmodified",
-> not "functionally validated".
+> **Known release gaps:** the promotion gate verifies the signature on the
+> current mutable `:testing` tag and checks that the promotion tree matches
+> `main`, but it does not bind that image digest to the exact commit being
+> promoted. If the latest `main` build fails, an older signed `:testing` image
+> may remain eligible. The gate also runs no end-to-end tests, so
+> `release/ready` is not functional validation.
 
 ## Image signing
 
