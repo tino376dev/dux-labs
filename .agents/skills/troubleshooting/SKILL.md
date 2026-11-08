@@ -26,7 +26,7 @@ CI runs the same checks; running them locally only makes the pull request quiet.
 | `bootc container lint` fails on a nonempty `/run` | a script wrote to `/run` into an image layer | remove it in `90-cleanup.sh`; that phase deliberately does not mount `/run` as tmpfs |
 | a third-party repository is live in the final image | a script enabled it and did not disable it | use `copr_install_isolated`, or disable it explicitly |
 | the package layer rebuilds on every overlay edit | packages drifted into the overlay phase | keep packages in `20-packages-and-services.sh` |
-| a package fails with `cpio: mkdir failed` under `/opt` | `/opt` is a symlink to `/var/opt`, which is missing before the Containerfile's `/opt` step | create the target early, as `30-native-apps.sh` does for Zen |
+| Zen's launcher exists but `/opt/zen/zen-bin` is missing | Zen was installed under `/var/opt`, which image cleanup removes | make `/opt` a real directory before installing packages and rebuild the image |
 | hadolint flags the Containerfile | a rule in `.github/hadolint.yaml` | fix it, or add a suppression with a reason |
 
 ## CI

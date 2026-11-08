@@ -11,7 +11,6 @@ setup() {
 	STUB_BIN="${TEST_ROOT}/stub-bin"
 	SCRIPT="${TEST_ROOT}/30-native-apps.sh"
 	NATIVE_APPS_REPO_DIR="${TEST_ROOT}/repos"
-	NATIVE_APPS_OPT_DIR="${TEST_ROOT}/var-opt"
 	DNF5_LOG="${TEST_ROOT}/dnf5.log"
 	RPM_LOG="${TEST_ROOT}/rpm.log"
 
@@ -20,7 +19,7 @@ setup() {
 	sed -e "s#/ctx/#${CTX}/#g" "${BUILD_SRC}" >"${SCRIPT}"
 
 	export PATH="${STUB_BIN}:${PATH}"
-	export DNF5_LOG RPM_LOG NATIVE_APPS_REPO_DIR NATIVE_APPS_OPT_DIR
+	export DNF5_LOG RPM_LOG NATIVE_APPS_REPO_DIR
 
 	cat >"${STUB_BIN}/dnf5" <<'EOF'
 #!/usr/bin/bash
@@ -66,10 +65,13 @@ teardown() {
 	[ ! -e "${NATIVE_APPS_REPO_DIR}/vscode.repo" ]
 }
 
-@test "30-native-apps: creates the /opt target before the Zen RPM unpacks" {
-	run bash "${SCRIPT}"
-	[ "${status}" -eq 0 ]
-	[ -d "${NATIVE_APPS_OPT_DIR}" ]
+@test "Containerfile: prepares immutable /opt before package installation" {
+	mapfile -t opt_commands < <(grep -nE '^RUN .* /opt' "${REPO_ROOT}/Containerfile")
+	[ "${#opt_commands[@]}" -eq 1 ]
+	[[ "${opt_commands[0]}" == *':RUN rm /opt && mkdir /opt' ]]
+	opt_line="${opt_commands[0]%%:*}"
+	package_line="$(grep -n '/ctx/build/20-packages-and-services.sh' "${REPO_ROOT}/Containerfile" | cut -d: -f1)"
+	[ "${opt_line}" -lt "${package_line}" ]
 }
 
 @test "30-native-apps: rejects non-Fedora bases clearly" {

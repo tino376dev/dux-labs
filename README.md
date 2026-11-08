@@ -38,6 +38,7 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 
 - Firefox is removed when it is present in the base image.
 - Third-party package repositories are disabled after image assembly.
+- `/opt` is immutable so RPM applications installed there remain in the image.
 
 ### Desktop configuration
 

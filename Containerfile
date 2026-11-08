@@ -62,6 +62,8 @@ ARG UBLUE_IMAGE_TAG="stable"
 ARG BASE_IMAGE_NAME=""
 ARG VERSION=""
 
+RUN rm /opt && mkdir /opt
+
 ### MODIFICATIONS
 ## Make modifications desired in your image and install packages by modifying the build scripts.
 ## The following RUN directives mount the ctx stage which includes:
@@ -129,14 +131,6 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     --mount=type=tmpfs,dst=/boot \
     /ctx/build/90-cleanup.sh
-
-### /opt
-## Makes /opt writeable by default. Needs to be here to make the main image
-## build strict (no /opt there). This is for downstream images/stuff like k0s.
-## If you need /opt as an immutable real directory for build-time packages
-## (e.g. google-chrome, docker-desktop), replace the next line with:
-##   RUN rm /opt && mkdir /opt
-RUN rm -rf /opt && ln -s /var/opt /opt
 
 ### IMAGE METADATA
 ## The Containerfile owns the metadata schema baked into every image. Local

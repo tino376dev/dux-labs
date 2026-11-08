@@ -27,6 +27,11 @@ structure, in order:
 
 Order matters for cache: volatile values go after the expensive layers.
 
+The image makes `/opt` a real, immutable directory before package installation.
+Zen's RPM installs there; leaving `/opt` linked to `/var/opt` would put its
+payload in mutable state, which cleanup removes and bootc does not deploy as
+image content. Do not restore the `/var/opt` symlink after installing packages.
+
 ## The Justfile
 
 ```bash

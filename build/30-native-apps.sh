@@ -10,7 +10,6 @@ set -euo pipefail
 ###############################################################################
 
 NATIVE_APPS_REPO_DIR="${NATIVE_APPS_REPO_DIR:-/etc/yum.repos.d}"
-NATIVE_APPS_OPT_DIR="${NATIVE_APPS_OPT_DIR:-/var/opt}"
 FEDORA_MAJOR="$(rpm -E '%fedora')"
 
 if [[ ! "${FEDORA_MAJOR}" =~ ^[0-9]+$ ]]; then
@@ -19,11 +18,6 @@ if [[ ! "${FEDORA_MAJOR}" =~ ^[0-9]+$ ]]; then
 fi
 
 mkdir -p "${NATIVE_APPS_REPO_DIR}"
-
-# /opt is a symlink to /var/opt, but the Containerfile only creates that link
-# after the package stages. Zen ships files under /opt/zen, so the target must
-# exist before its RPM unpacks.
-mkdir -p "${NATIVE_APPS_OPT_DIR}"
 
 # Zen Browser is distributed as a Fedora RPM by this COPR.
 # shellcheck source=/dev/null
