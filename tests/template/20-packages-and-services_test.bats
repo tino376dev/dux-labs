@@ -87,6 +87,15 @@ teardown() {
 	[ "${calls[0]}" = "install -y just gum fzf jq" ]
 }
 
+@test "20-packages-and-services: installs Homebrew's Linux build requirements" {
+	run bash "${SCRIPT}"
+	[ "$status" -eq 0 ]
+
+	mapfile -t calls <"${DNF5_LOG}"
+	[ "${calls[1]}" = "group install -y development-tools" ]
+	[ "${calls[2]}" = "install -y procps-ng curl file ppp" ]
+}
+
 @test "20-packages-and-services: removes Firefox from the base when installed" {
 	FIREFOX_INSTALLED=1 run bash "${SCRIPT}"
 	[ "$status" -eq 0 ]
@@ -103,10 +112,10 @@ teardown() {
 	[ "$status" -eq 0 ]
 
 	mapfile -t calls <"${DNF5_LOG}"
-	[ "${#calls[@]}" -eq 4 ]
-	[ "${calls[1]}" = "-y copr enable ublue-os/packages" ]
-	[ "${calls[2]}" = "-y copr disable ublue-os/packages" ]
-	[ "${calls[3]}" = "-y install --enablerepo=copr:copr.fedorainfracloud.org:ublue-os:packages uupd" ]
+	[ "${#calls[@]}" -eq 6 ]
+	[ "${calls[3]}" = "-y copr enable ublue-os/packages" ]
+	[ "${calls[4]}" = "-y copr disable ublue-os/packages" ]
+	[ "${calls[5]}" = "-y install --enablerepo=copr:copr.fedorainfracloud.org:ublue-os:packages uupd" ]
 }
 
 @test "20-packages-and-services: enables the update timers" {

@@ -12,7 +12,6 @@ brew "azure-cli"
 brew "databricks"
 
 # Editors, language tools, and formatters
-brew "gcc"
 brew "markdown-oxide"
 brew "marksman"
 brew "openfortivpn"

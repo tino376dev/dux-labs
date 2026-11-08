@@ -36,6 +36,16 @@ dnf5 install -y just gum fzf jq
 
 echo "::endgroup::"
 
+echo "::group:: Install Homebrew build requirements"
+
+# Homebrew on Linux requires the host toolchain; its own gcc formula cannot
+# replace the system compiler used by Homebrew's bootstrap and post-install steps.
+dnf5 group install -y development-tools
+# OpenFortiVPN delegates PPP session setup to pppd from Fedora's ppp package.
+dnf5 install -y procps-ng curl file ppp
+
+echo "::endgroup::"
+
 echo "::group:: Install uupd"
 
 # uupd owns the update policy. Its binary comes from the ublue-os/packages

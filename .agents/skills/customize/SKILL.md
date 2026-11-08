@@ -37,6 +37,10 @@ Prefer a package the base already ships. When a COPR is unavoidable,
 
 Brewfiles in `custom/brew/`, plus a `ujust` recipe so users install it by name.
 [custom/brew/README.md](../../../custom/brew/README.md) has the format.
+On Linux, Homebrew also requires a system C compiler and development tools; a
+Homebrew-installed `gcc` does not replace that host prerequisite. Put those
+requirements in the image package phase when the image is expected to support
+Homebrew source builds.
 
 ### Flatpak
 
