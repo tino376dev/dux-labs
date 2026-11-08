@@ -11,6 +11,7 @@ setup() {
 	STUB_BIN="${TEST_ROOT}/stub-bin"
 	SCRIPT="${TEST_ROOT}/30-native-apps.sh"
 	NATIVE_APPS_REPO_DIR="${TEST_ROOT}/repos"
+	NATIVE_APPS_OPT_DIR="${TEST_ROOT}/var-opt"
 	DNF5_LOG="${TEST_ROOT}/dnf5.log"
 	RPM_LOG="${TEST_ROOT}/rpm.log"
 
@@ -19,7 +20,7 @@ setup() {
 	sed -e "s#/ctx/#${CTX}/#g" "${BUILD_SRC}" >"${SCRIPT}"
 
 	export PATH="${STUB_BIN}:${PATH}"
-	export DNF5_LOG RPM_LOG NATIVE_APPS_REPO_DIR
+	export DNF5_LOG RPM_LOG NATIVE_APPS_REPO_DIR NATIVE_APPS_OPT_DIR
 
 	cat >"${STUB_BIN}/dnf5" <<'EOF'
 #!/usr/bin/bash
@@ -63,6 +64,12 @@ teardown() {
 	grep -Fx -- "--import https://packages.microsoft.com/keys/microsoft.asc" "${RPM_LOG}"
 	[ ! -e "${NATIVE_APPS_REPO_DIR}/microsoft-edge.repo" ]
 	[ ! -e "${NATIVE_APPS_REPO_DIR}/vscode.repo" ]
+}
+
+@test "30-native-apps: creates the /opt target before the Zen RPM unpacks" {
+	run bash "${SCRIPT}"
+	[ "${status}" -eq 0 ]
+	[ -d "${NATIVE_APPS_OPT_DIR}" ]
 }
 
 @test "30-native-apps: rejects non-Fedora bases clearly" {
