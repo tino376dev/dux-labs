@@ -36,7 +36,6 @@ setup() {
 	# Representative build context contents.
 	printf 'shared-payload\n' >"${CTX}/oci/common/shared/.keep"
 	printf 'brew "tmux"\n' >"${CTX}/custom/brew/default.Brewfile"
-	printf 'brew "gcc"\n' >"${CTX}/custom/brew/development.Brewfile"
 	printf 'custom-apps-marker:\n\techo apps\n' >"${CTX}/custom/ujust/custom-apps.just"
 	printf 'custom-system-marker:\n\techo system\n' >"${CTX}/custom/ujust/custom-system.just"
 	printf '# not a just file\n' >"${CTX}/custom/ujust/README.md"
@@ -148,7 +147,7 @@ teardown() {
 	[ "$status" -eq 0 ]
 
 	[ -f "${HOMEBREW_DIR}/default.Brewfile" ]
-	[ -f "${HOMEBREW_DIR}/development.Brewfile" ]
+	[ ! -e "${HOMEBREW_DIR}/development.Brewfile" ]
 	grep -q 'brew "tmux"' "${HOMEBREW_DIR}/default.Brewfile"
 }
 

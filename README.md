@@ -27,13 +27,11 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 
 ### Optional applications
 
-- **Homebrew defaults:** bat, carapace, dust, eza, fd, fish, gh, git-delta,
-  glow, helix, micro, numbat, nushell, ripgrep, starship,
-  vivid, yazi, and zoxide. Install with `ujust install-default-apps`.
-- **Homebrew development tools:** azure-cli, bats-core, databricks, dprint,
-  gcc, markdown-oxide, marksman, openfortivpn, ruff, shellcheck, tinymist,
-  topiary, typst, and vscode-langservers-extracted. Install with `ujust
-  install-dev-tools`.
+- **Homebrew applications:** azure-cli, bat, bats-core, carapace, databricks,
+  dprint, dust, eza, fd, fish, gh, git-delta, glow, helix, markdown-oxide,
+  marksman, micro, numbat, nushell, openfortivpn, ripgrep, ruff, shellcheck,
+  starship, tinymist, topiary, typst, vivid, vscode-langservers-extracted,
+  yazi, and zoxide. Install with `ujust install-default-apps`.
 - **Flatpaks installed on first boot:** Logseq, Remmina, Signal, Thunderbird,
   Flatseal, and Extension Manager.
 
@@ -185,8 +183,7 @@ sudo systemctl reboot
 Then, as your user:
 
 ```bash
-ujust install-default-apps    # Homebrew: the default Brewfile
-ujust install-dev-tools       # Homebrew: the development Brewfile
+ujust install-default-apps    # Homebrew: all declared formulae
 ujust configure-dev-groups    # add yourself to docker and libvirt
 ujust install-config          # re-apply the image defaults, backing up yours
 ```

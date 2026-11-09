@@ -4,19 +4,18 @@ Brewfiles declared here are copied into the image at
 `/usr/share/ublue-os/homebrew/`. Users install them after boot; nothing is
 installed at build time.
 
-## Files
+## Brewfile
 
-- `default.Brewfile` — the essential CLI tools
-- `development.Brewfile` — the development stack
+`default.Brewfile` contains all optional Homebrew formulae, including
+development tools. Install them with `ujust install-default-apps`.
 
 The image also ships `/usr/share/ublue-os/homebrew/fonts.Brewfile`, a curated
 font set from Common's shared layer, so this directory does not need its own.
 
 ## Adding one
 
-Write a `.Brewfile` here, then add a `ujust` recipe for it in
-`custom/ujust/custom-apps.just` so users install it by name instead of
-remembering the path. That directory's README has the recipe shape.
+Add formulae to `default.Brewfile`. The `install-default-apps` recipe in
+`custom/ujust/custom-apps.just` installs the complete list.
 
 ## Format
 
@@ -48,7 +47,6 @@ or, on an image built from this template:
 
 ```bash
 ujust install-default-apps
-ujust install-dev-tools
 ```
 
 Homebrew itself is pre-staged at build time and unpacked on first boot by

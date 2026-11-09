@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 # Tests for custom/ujust/custom-apps.just recipes:
-#   install-default-apps, install-dev-tools.
+#   install-default-apps.
 #
 # Each shebang recipe body is extracted out of the justfile into a standalone
 # bash script and run against a PATH mock for brew, so the Brewfile path and
@@ -58,20 +58,12 @@ _run_recipe() {
         /usr/bin/bash "${WORKDIR}/${recipe}.sh"
 }
 
-@test "install-default-apps bundles only the default Brewfile" {
+@test "install-default-apps bundles the combined Brewfile" {
     _run_recipe "install-default-apps"
 
     [ "${status}" -eq 0 ]
     [ "$(grep -cF "brew bundle" "${COMMAND_LOG}")" -eq 1 ]
     grep -qF "brew bundle --file /usr/share/ublue-os/homebrew/default.Brewfile" "${COMMAND_LOG}"
-}
-
-@test "install-dev-tools bundles only the development Brewfile" {
-    _run_recipe "install-dev-tools"
-
-    [ "${status}" -eq 0 ]
-    [ "$(grep -cF "brew bundle" "${COMMAND_LOG}")" -eq 1 ]
-    grep -qF "brew bundle --file /usr/share/ublue-os/homebrew/development.Brewfile" "${COMMAND_LOG}"
 }
 
 @test "a failing bundle reports a nonzero exit" {

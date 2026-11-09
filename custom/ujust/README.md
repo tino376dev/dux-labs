@@ -13,7 +13,7 @@ recursive, so recipes can be grouped into subdirectories by topic.
 ## Writing a recipe
 
 ```just
-# Install the default applications via Homebrew
+# Install Homebrew applications
 [group('Apps')]
 install-default-apps:
     #!/usr/bin/env bash
