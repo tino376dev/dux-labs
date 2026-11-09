@@ -19,14 +19,16 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 
 - Niri, Dux Modular Shell, Dux Greeter, Dux Files, Dux Search, Dux GOP, Dux
   Calendar, Quickshell, Matugen, and the desktop integration packages they use.
-- `just`, `gum`, `fzf`, `jq`, and `uupd` with its scheduled update timers.
+- `just`, `gum`, `fzf`, `jq`, `podman-compose`, `podman-docker`, and `uupd`
+  with its scheduled update timers. `podman-docker` provides the `docker`
+  command as a Podman wrapper.
 - Native RPM applications: Microsoft Edge, Zen Browser, Zed, and Visual Studio
   Code.
 
 ### Optional applications
 
 - **Homebrew defaults:** bat, carapace, dust, eza, fd, fish, gh, git-delta,
-  glow, helix, micro, numbat, nushell, podman-compose, ripgrep, starship,
+  glow, helix, micro, numbat, nushell, ripgrep, starship,
   vivid, yazi, and zoxide. Install with `ujust install-default-apps`.
 - **Homebrew development tools:** azure-cli, databricks, gcc, markdown-oxide,
   marksman, openfortivpn, ruff, tinymist, topiary, and typst. Install with

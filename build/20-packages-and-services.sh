@@ -14,6 +14,8 @@ set -euo pipefail
 #   gum   - interactive prompts used by the shared and custom ujust recipes
 #   fzf   - ujust --choose, without a first-use Homebrew download
 #   jq    - the ublue setup hooks and several recipes
+#   podman-compose - compose support for the base Podman installation
+#   podman-docker   - provides the docker command as a Podman wrapper
 #   uupd  - background update policy, from the ublue-os/packages COPR
 ###############################################################################
 
@@ -32,7 +34,7 @@ if rpm -q firefox >/dev/null 2>&1; then
 	echo "::endgroup::"
 fi
 
-dnf5 install -y just gum fzf jq
+dnf5 install -y just gum fzf jq podman-compose podman-docker
 
 echo "::endgroup::"
 
