@@ -30,9 +30,10 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 - **Homebrew defaults:** bat, carapace, dust, eza, fd, fish, gh, git-delta,
   glow, helix, micro, numbat, nushell, ripgrep, starship,
   vivid, yazi, and zoxide. Install with `ujust install-default-apps`.
-- **Homebrew development tools:** azure-cli, databricks, gcc, markdown-oxide,
-  marksman, openfortivpn, ruff, tinymist, topiary, and typst. Install with
-  `ujust install-dev-tools`.
+- **Homebrew development tools:** azure-cli, bats-core, databricks, dprint,
+  gcc, markdown-oxide, marksman, openfortivpn, ruff, shellcheck, tinymist,
+  topiary, typst, and vscode-langservers-extracted. Install with `ujust
+  install-dev-tools`.
 - **Flatpaks installed on first boot:** Logseq, Remmina, Signal, Thunderbird,
   Flatseal, and Extension Manager.
 

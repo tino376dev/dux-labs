@@ -11,6 +11,12 @@
 brew "azure-cli"
 brew "databricks"
 
+# Agent and editor tooling
+brew "bats-core"
+brew "dprint"
+brew "shellcheck"
+brew "vscode-langservers-extracted"
+
 # Editors, language tools, and formatters
 brew "markdown-oxide"
 brew "marksman"
@@ -27,10 +33,4 @@ brew "typst"
 # brew "python@3.12"    # Python
 # brew "rust"           # Rust programming language
 
-# Build tools
-# brew "cmake"          # Cross-platform build system
-# brew "ninja"          # Small build system
 
-# Debugging and profiling
-# brew "gdb"            # GNU debugger
-# brew "valgrind"       # Memory debugging tool
