@@ -5,9 +5,9 @@ set -euo pipefail
 ###############################################################################
 # Image identity
 ###############################################################################
-# This is the first mutable image phase. It writes the identity consumed by
-# bootc tooling and makes the installed operating system identify itself as
-# this image rather than as its upstream base.
+# The identity phase writes the metadata consumed by bootc tooling and makes
+# the installed operating system identify itself as this image. The version
+# phase runs after package installation to preserve build cache reuse.
 #
 # The Containerfile is the source of truth for IMAGE_NAME, IMAGE_VENDOR and
 # UBLUE_IMAGE_TAG. BASE_IMAGE_NAME and FEDORA_MAJOR_VERSION both describe the
@@ -19,6 +19,12 @@ set -euo pipefail
 : "${IMAGE_VENDOR:?IMAGE_VENDOR must be set}"
 : "${UBLUE_IMAGE_TAG:?UBLUE_IMAGE_TAG must be set}"
 : "${BASE_IMAGE_NAME:?BASE_IMAGE_NAME must be set}"
+
+mode="${1:-all}"
+case "${mode}" in
+    all|identity|version) ;;
+    *) printf 'Unknown image-info mode: %s\n' "${mode}" >&2; exit 1 ;;
+esac
 
 VERSION="${VERSION:-${UBLUE_IMAGE_TAG}}"
 HOME_URL="${HOME_URL:-https://github.com/${IMAGE_VENDOR}/${IMAGE_NAME}}"
@@ -98,8 +104,9 @@ set_os_release_value() {
 ###############################################################################
 # Preserve Bluefin's generic schema: bootc image builders and ISO tooling read
 # image-ref, while UBlue-aware runtime tools use the remaining identity fields.
-install -d "$(dirname "${IMAGE_INFO}")"
-cat >"${IMAGE_INFO}" <<EOF
+if [[ "${mode}" != version ]]; then
+    install -d "$(dirname "${IMAGE_INFO}")"
+    cat >"${IMAGE_INFO}" <<EOF
 {
   "image-name": "$(json_escape "${IMAGE_NAME}")",
   "image-vendor": "$(json_escape "${IMAGE_VENDOR}")",
@@ -109,6 +116,7 @@ cat >"${IMAGE_INFO}" <<EOF
   "fedora-version": "$(json_escape "${FEDORA_MAJOR_VERSION}")"
 }
 EOF
+fi
 
 ###############################################################################
 # /usr/lib/os-release
@@ -117,24 +125,30 @@ EOF
 # values. Fedora Silverblue already has VARIANT_ID, so appending only when it
 # was absent left installed Finpilot images reporting themselves as Fedora.
 if [[ -f "${OS_RELEASE}" ]]; then
-    set_os_release_value "VARIANT_ID" "${IMAGE_NAME}"
-    set_os_release_value "PRETTY_NAME" "${IMAGE_NAME} (Version: ${VERSION})"
-    set_os_release_value "NAME" "${IMAGE_NAME}"
-    set_os_release_value "HOME_URL" "${HOME_URL}"
-    set_os_release_value "DOCUMENTATION_URL" "${DOCUMENTATION_URL}"
-    set_os_release_value "SUPPORT_URL" "${SUPPORT_URL}"
-    set_os_release_value "BUG_REPORT_URL" "${BUG_REPORT_URL}"
-    set_os_release_value "VERSION" "${VERSION} (${BASE_IMAGE_NAME})"
-    set_os_release_value "OSTREE_VERSION" "${VERSION}"
-    set_os_release_value "IMAGE_ID" "${IMAGE_NAME}"
-    set_os_release_value "IMAGE_VERSION" "${VERSION}"
+    if [[ "${mode}" != version ]]; then
+        set_os_release_value "VARIANT_ID" "${IMAGE_NAME}"
+        set_os_release_value "NAME" "${IMAGE_NAME}"
+        set_os_release_value "HOME_URL" "${HOME_URL}"
+        set_os_release_value "DOCUMENTATION_URL" "${DOCUMENTATION_URL}"
+        set_os_release_value "SUPPORT_URL" "${SUPPORT_URL}"
+        set_os_release_value "BUG_REPORT_URL" "${BUG_REPORT_URL}"
+        set_os_release_value "IMAGE_ID" "${IMAGE_NAME}"
+    fi
+    if [[ "${mode}" != identity ]]; then
+        set_os_release_value "PRETTY_NAME" "${IMAGE_NAME} (Version: ${VERSION})"
+        set_os_release_value "VERSION" "${VERSION} (${BASE_IMAGE_NAME})"
+        set_os_release_value "OSTREE_VERSION" "${VERSION}"
+        set_os_release_value "IMAGE_VERSION" "${VERSION}"
+    fi
 
     # The build commit is deliberately not written here. SHA_HEAD_SHORT is
     # declared late in the Containerfile so a new commit only invalidates the
-    # label layer, and this phase runs first, so the value is not available.
+    # label layer, and the identity phase runs first, so it is not available.
     # The commit ships as org.opencontainers.image.revision instead.
 fi
 
-printf 'Wrote %s\n' "${IMAGE_INFO}"
-printf '  image-name: %s\n' "${IMAGE_NAME}"
-printf '  image-vendor: %s\n' "${IMAGE_VENDOR}"
+if [[ "${mode}" != version ]]; then
+    printf 'Wrote %s\n' "${IMAGE_INFO}"
+    printf '  image-name: %s\n' "${IMAGE_NAME}"
+    printf '  image-vendor: %s\n' "${IMAGE_VENDOR}"
+fi

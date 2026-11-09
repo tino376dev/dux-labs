@@ -325,6 +325,17 @@ podman_build_args() {
     [ "$status" -eq 0 ]
 }
 
+@test "Containerfile: writes version after the expensive build phases" {
+    run awk '
+        /00-image-info.sh identity/ { identity = NR }
+        /90-cleanup.sh$/ { cleanup = NR }
+        /^ARG VERSION=/ { version_arg = NR; count++ }
+        /00-image-info.sh version/ { version_write = NR }
+        END { exit !(identity && cleanup > identity && version_arg > cleanup && version_write > version_arg && count == 1) }
+    ' "${REPO_ROOT}/Containerfile"
+    [ "$status" -eq 0 ]
+}
+
 @test "build: reads the layer cache but never writes it by default" {
     run_just build finpilot stable
     [ "$status" -eq 0 ]

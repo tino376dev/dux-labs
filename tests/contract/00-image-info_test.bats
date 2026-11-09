@@ -89,6 +89,32 @@ json_field() {
     grep -q '^ID_LIKE="fedora"$' "${OS_RELEASE}"
 }
 
+@test "00-image-info: separates stable identity from version fields" {
+    export VERSION="44.20260907.1"
+    run bash "${IMAGE_INFO_SRC}" identity
+    [ "$status" -eq 0 ]
+    grep -q '^VARIANT_ID="finpilot"$' "${OS_RELEASE}"
+    grep -q '^VERSION="44.20260905.0 (Silverblue)"$' "${OS_RELEASE}"
+    [ "$(json_field image-name)" = "finpilot" ]
+
+    sed -i 's/^NAME=.*/NAME="Custom"/' "${OS_RELEASE}"
+    rm "${IMAGE_INFO_JSON}"
+    run bash "${IMAGE_INFO_SRC}" version
+    [ "$status" -eq 0 ]
+    [ ! -e "${IMAGE_INFO_JSON}" ]
+    grep -q '^NAME="Custom"$' "${OS_RELEASE}"
+    grep -q '^PRETTY_NAME="finpilot (Version: 44.20260907.1)"$' "${OS_RELEASE}"
+    grep -q '^VERSION="44.20260907.1 (silverblue)"$' "${OS_RELEASE}"
+    grep -q '^OSTREE_VERSION="44.20260907.1"$' "${OS_RELEASE}"
+    grep -q '^IMAGE_VERSION="44.20260907.1"$' "${OS_RELEASE}"
+}
+
+@test "00-image-info: rejects an unknown mode" {
+    run bash "${IMAGE_INFO_SRC}" unknown
+    [ "$status" -ne 0 ]
+    [ ! -f "${IMAGE_INFO_JSON}" ]
+}
+
 @test "00-image-info: derives GitHub URLs from image identity" {
     run_script
     [ "$status" -eq 0 ]

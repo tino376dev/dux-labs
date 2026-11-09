@@ -60,7 +60,6 @@ ARG IMAGE_VENDOR="projectbluefin"
 ARG UBLUE_IMAGE_TAG="stable"
 # Supplied by `just build` from the base image's FROM line.
 ARG BASE_IMAGE_NAME=""
-ARG VERSION=""
 
 RUN rm /opt && mkdir /opt
 
@@ -78,7 +77,7 @@ RUN rm /opt && mkdir /opt
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build/00-image-info.sh
+    /ctx/build/00-image-info.sh identity
 
 # Set dnf options before build scripts (persists across subsequent RUN layers)
 RUN cp /etc/dnf/dnf.conf /etc/dnf/dnf.conf.tmp \
@@ -132,11 +131,15 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
     /ctx/build/90-cleanup.sh
 
+ARG VERSION=""
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    /ctx/build/00-image-info.sh version
+
 ### IMAGE METADATA
 ## The Containerfile owns the metadata schema baked into every image. Local
 ## builds and CI supply the dynamic values through `just build`; keeping these
-## ARGs late prevents a new version or timestamp from invalidating package and
-## overlay layers above.
+## ARGs late prevents a new timestamp from invalidating package and overlay
+## layers above. VERSION is also declared late for the os-release update.
 ARG IMAGE_DESC="My Customized Universal Blue Image"
 ARG IMAGE_CREATED=""
 ARG IMAGE_LOGO_URL="https://avatars.githubusercontent.com/u/120078124?s=200&v=4"
