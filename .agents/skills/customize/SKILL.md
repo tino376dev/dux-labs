@@ -13,7 +13,7 @@ description: >-
 | The thing is… | Put it in | Installed |
 |---|---|---|
 | A system package the image needs to boot or run | `build/20-packages-and-services.sh` | at build time |
-| A CLI tool a user chooses to have | `custom/brew/*.Brewfile` | on demand, by the user |
+| A CLI tool a user chooses to have | `custom/brew/default.Brewfile` | on demand, by the user |
 | A GUI application | `custom/flatpaks/*.preinstall` | on first boot |
 | A command that configures the system | `custom/ujust/*.just` | available from first login |
 | A system file: unit, preset, tmpfiles.d | `custom/files/` | at build time |
@@ -35,7 +35,8 @@ Prefer a package the base already ships. When a COPR is unavoidable,
 
 ### Homebrew
 
-Brewfiles in `custom/brew/`, plus a `ujust` recipe so users install it by name.
+Add Homebrew formulae to the single `custom/brew/default.Brewfile`; the
+`install-default-apps` recipe installs the complete list.
 [custom/brew/README.md](../../../custom/brew/README.md) has the format.
 On Linux, Homebrew also requires a system C compiler and development tools; a
 Homebrew-installed `gcc` does not replace that host prerequisite. Put those

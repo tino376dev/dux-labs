@@ -22,8 +22,10 @@ structure, in order:
    major, the image name, and the digest all follow from it.
 4. **Phases** — one `RUN` block per script, in the order they are named.
    [build/README.md](../../../build/README.md) lists them.
-5. **Metadata** — the `LABEL` block, fed by ARGs declared late so a new version
-   or commit only invalidates the label layer.
+5. **Metadata** — the version fields in `os-release` and the `LABEL` block,
+   fed by ARGs declared after the expensive phases. `00-image-info.sh identity`
+   writes stable identity early; `00-image-info.sh version` writes the changing
+   version late so it does not invalidate package layers.
 
 Order matters for cache: volatile values go after the expensive layers.
 

@@ -38,8 +38,5 @@ brew "ruff"
 brew "shellcheck"
 brew "topiary"
 
-# Networking
-brew "openfortivpn"
-
 # Mathematics
 brew "numbat"

@@ -16,6 +16,7 @@ set -euo pipefail
 #   jq    - the ublue setup hooks and several recipes
 #   podman-compose - compose support for the base Podman installation
 #   podman-docker   - provides the docker command as a Podman wrapper
+#   openfortivpn, ppp - VPN client and PPP support
 #   uupd  - background update policy, from the ublue-os/packages COPR
 ###############################################################################
 
@@ -34,7 +35,7 @@ if rpm -q firefox >/dev/null 2>&1; then
 	echo "::endgroup::"
 fi
 
-dnf5 install -y just gum fzf jq podman-compose podman-docker
+dnf5 install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp
 
 echo "::endgroup::"
 
@@ -43,8 +44,7 @@ echo "::group:: Install Homebrew build requirements"
 # Homebrew on Linux requires the host toolchain; its own gcc formula cannot
 # replace the system compiler used by Homebrew's bootstrap and post-install steps.
 dnf5 group install -y development-tools
-# OpenFortiVPN delegates PPP session setup to pppd from Fedora's ppp package.
-dnf5 install -y procps-ng curl file ppp
+dnf5 install -y procps-ng curl file
 
 echo "::endgroup::"
 
