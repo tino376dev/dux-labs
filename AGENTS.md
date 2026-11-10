@@ -48,7 +48,7 @@ the next agent needs it.
 
 ## Desktop
 
-- The image uses the rolling, digest-pinned [`base-nvidia`](https://github.com/ublue-os/hwe/pkgs/container/base-nvidia/versions?filters%5Bversion_type%5D=tagged) image. `latest` follows the current Fedora major; `stable` can lag. `just build` derives its Fedora version from the pinned image's OCI version label.
+- The image uses digest-pinned `ghcr.io/ublue-os/base-main:N`; Renovate advances the digest within the manually selected Fedora major. NVIDIA open modules come from UBlue's signed akmods image for the exact base kernel. Major updates require manual base and akmods validation; `just build` derives the version from the tag.
 - Niri is a compositor, not a complete desktop. Follow its [integration](https://niri-wm.github.io/niri/Integrating-niri.html), [portal](https://niri-wm.github.io/niri/Important-Software.html), and [NVIDIA](https://niri-wm.github.io/niri/Nvidia.html) guidance when changing session startup, portals, or driver settings.
 - Use the [DMS installation](https://duxlabs.dev/docs/dms/installation) and [compositor setup](https://duxlabs.dev/docs/dms/compositors) docs for configuration guidance. DMS packages come from the [Dux Labs DMS](https://copr.fedorainfracloud.org/coprs/duxlabs/dms/) and [Dux repository](https://copr.fedorainfracloud.org/coprs/duxlabs/dux-repo/) COPRs; development builds use [Dux Labs DMS Git](https://copr.fedorainfracloud.org/coprs/duxlabs/dms-git/). Existing installations from AvengeMedia COPRs migrate with `dms migrate dux`. Niri packages come from [yalter/niri](https://copr.fedorainfracloud.org/coprs/yalter/niri/).
 

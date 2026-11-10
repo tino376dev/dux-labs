@@ -139,14 +139,13 @@ podman_build_args() {
     [[ "$(podman_build_args)" == *"--build-arg VERSION=45.20260830"* ]]
 }
 
-@test "build: resolves Fedora major from a pinned rolling base-nvidia tag" {
+@test "build: reads Fedora major and image name from the pinned base-main tag" {
     local digest="sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    printf 'FROM ghcr.io/ublue-os/base-nvidia:latest@%s\n' "${digest}" >"${SANDBOX}/Containerfile"
+    printf 'FROM ghcr.io/ublue-os/base-main:45@%s\n' "${digest}" >"${SANDBOX}/Containerfile"
     run_just build finpilot stable
     [ "$status" -eq 0 ]
-    [[ "$(podman_build_args)" == *"--build-arg VERSION=44.20260830"* ]]
-    [[ "$(podman_build_args)" == *"--build-arg BASE_IMAGE_NAME=base-nvidia"* ]]
-    grep -Fx "inspect --config docker://ghcr.io/ublue-os/base-nvidia@${digest}" "${SKOPEO_LOG}"
+    [[ "$(podman_build_args)" == *"--build-arg VERSION=45.20260830"* ]]
+    [[ "$(podman_build_args)" == *"--build-arg BASE_IMAGE_NAME=base-main"* ]]
 }
 
 @test "build: accepts a base FROM line without a digest" {

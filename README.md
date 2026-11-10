@@ -12,7 +12,8 @@ It is built to be driven by hand or by an agent.
 
 ## Image Differences
 
-The default image is based on Fedora's `ghcr.io/ublue-os/base-nvidia` bootc
+The default image is based on Fedora's minimal `ghcr.io/ublue-os/base-main`
+bootc image, with NVIDIA open drivers added from UBlue's kernel-matched akmods
 image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 
 ### Build-time packages and applications
@@ -24,6 +25,8 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
   provides the `docker` command as a Podman wrapper.
 - Native RPM applications: Microsoft Edge, Zen Browser, Zed, and Visual Studio
   Code.
+- NVIDIA open kernel modules and container-device support, signed for Secure
+  Boot with the UBlue kernel-signing key.
 
 ### Optional applications
 
@@ -95,9 +98,13 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 ## Customize
 
 Pick your base image on the `Containerfile`'s `FROM` line; this repository
-defaults to Fedora's `ghcr.io/ublue-os/base-nvidia`. That line is the only place
-the base is chosen: `just build` reads the image name and tag from it, and the
-Fedora major comes from the base image itself during the build.
+defaults to Fedora's minimal `ghcr.io/ublue-os/base-main:45`. The tag is
+digest-pinned, and Renovate updates the digest within Fedora 45; major-version
+changes remain manual. The NVIDIA phase pulls UBlue akmods for the base's exact
+kernel. With Secure Boot enabled, run
+`ujust enroll-secure-boot-key` on the installed image if the UBlue
+kernel-signing key is not already enrolled, then complete enrollment during
+reboot.
 
 Then add to your image:
 

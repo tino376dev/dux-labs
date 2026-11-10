@@ -25,7 +25,8 @@
 #    - @ublue-os/brew - Homebrew integration
 #
 # 2. Base Image Options (edit the FROM line below):
-#    - `ghcr.io/ublue-os/base-nvidia` (Fedora, NVIDIA drivers, no GNOME desktop)
+#    - `ghcr.io/ublue-os/base-main` (minimal Fedora base; NVIDIA added below)
+#    - `ghcr.io/ublue-os/silverblue-main` (Fedora Silverblue)
 #    - `quay.io/fedora-ostree-desktops/base-main` (Fedora, no desktop)
 #    - `quay.io/centos-bootc/centos-bootc:stream10` (CentOS-based)
 #    - `quay.io/hummingbird-community/bootc-os` (Hummingbird-based, minimal)
@@ -34,7 +35,7 @@
 ###############################################################################
 
 # OCI context images - imported below and pinned directly in their FROM lines.
-# The base image is pinned in the FROM line below and updated by Renovate.
+# Shared OCI layers are pinned in their FROM lines and updated by Renovate.
 FROM ghcr.io/projectbluefin/common:latest@sha256:b7e3487cafe8b21e10bb514f218406548f4c1abef5e444963094cbf2ec60e4b1 AS common
 FROM ghcr.io/ublue-os/brew:latest@sha256:e9a72571b7644b6277f0638b6a3c5e497e265e1098ab91224567acbdeb8b74ea AS brew
 
@@ -48,10 +49,9 @@ COPY custom /custom
 COPY --from=common /system_files /oci/common
 COPY --from=brew /system_files /oci/brew
 
-# Base Image - Fedora's NVIDIA-enabled base, following the rolling Fedora release.
-# Renovate keeps the digest pinned; the build recipe derives the Fedora major
-# from the version label on this exact manifest.
-FROM ghcr.io/ublue-os/base-nvidia:latest@sha256:6b15c82b94bb93c00005207c5e612b417b5710670f16f7c8b5ebf37cf46c401f
+# Base Image - UBlue's minimal base, held to Fedora 45. Renovate advances the
+# digest within this major; NVIDIA support uses matching signed akmods below.
+FROM ghcr.io/ublue-os/base-main:45@sha256:444e9e37ea581e76829772ae2a42edfdbacdd0cbc7a27085a4ed0f3d6e1336c7
 
 # Image identity - these define how bootc, fastfetch, and the ublue ecosystem
 # recognize your image. Change these to match your project name.
@@ -71,8 +71,8 @@ RUN rm /opt && mkdir /opt
 ##   - Files from @projectbluefin/common at /oci/common (includes branding/artwork content)
 ##   - Files from @ublue-os/brew at /oci/brew
 ## Scripts run in the order of the RUN blocks below: image identity, runtime
-## overlays, default packages and services, then cleanup. An activated example
-## gets its own block between the package phase and the cleanup phase.
+## overlays, default packages and services, then cleanup. Optional application
+## and hardware phases run between the package phase and cleanup.
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
@@ -106,6 +106,15 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build/20-packages-and-services.sh
+
+### NVIDIA DRIVERS
+## Installs the signed NVIDIA open kernel module matching the base kernel.
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=tmpfs,dst=/boot \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/50-nvidia.sh
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache/libdnf5 \

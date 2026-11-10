@@ -3,31 +3,20 @@
 set -euo pipefail
 
 ###############################################################################
-# Example: NVIDIA driver and container toolkit
+# NVIDIA driver and container toolkit
 ###############################################################################
-# Provisions NVIDIA support into the base image from the pre-built akmods that
-# ublue-os publishes, following Bluefin's NVIDIA setup step for step.
+# Provisions NVIDIA support on UBlue's minimal base from signed, pre-built
+# akmods matching the exact kernel in the base image.
 #
 # Nothing is compiled here. ublue-os/akmods publishes the modules as a container
 # image whose tag carries the exact kernel version, so the akmod and the kernel
 # it was built against are always taken together.
 #
-# To use this script:
-# 1. Rename it to remove the .example extension: 50-nvidia.sh
-# 2. Add the explicit RUN block from build/README.md for
-#    /ctx/build/50-nvidia.sh after the 20-packages-and-services.sh block and
-#    before the 90-cleanup.sh block in the Containerfile.
-#
 # Hardware-verified only: a container build can install the driver but cannot
 # prove it loads or that Wayland comes up. Check `nvidia-smi` on a real GPU.
-#
-# Bluefin adds Mutter's kms-modifiers for NVIDIA images in its image-info phase,
-# by amending the gschema override its Common layer ships. This template overlays
-# Common's shared layer only, so that override is not present here. Add the key
-# yourself if your hardware needs it.
 ###############################################################################
 
-# Stock Fedora kernels, Silverblue included, use the "main" flavor.
+# Stock Fedora kernels use the "main" flavor.
 AKMODS_FLAVOR="${AKMODS_FLAVOR:-main}"
 AKMODS_TAG="${AKMODS_FLAVOR}-$(rpm -E %fedora)-$(rpm -q kernel-core --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')"
 
@@ -37,12 +26,9 @@ echo "::group:: Pull the pre-built kernel modules"
 # and the base weekly, so there is a window where this pull has nothing to fetch.
 dnf5 install -y skopeo jq
 
-# The akmods image carries kernel modules and the driver RPMs that
-# nvidia-install.sh installs as root, so the pull only accepts content signed by
-# ublue-os/akmods. The key is build/akmods-cosign.pub, a copy of the repository's
-# cosign.pub, so a registry or tag that is not theirs cannot supply the modules.
-# The signature names the floating `main-NN` reference while the pull is the
-# kernel-exact tag, so the identity is matched by repository, not by tag.
+# The image carries kernel modules and driver RPMs. Only accept content signed
+# by ublue-os/akmods. The signature names the floating `main-NN` reference while
+# the pull uses the kernel-exact tag, so match the repository rather than tag.
 AKMODS_IMAGE="ghcr.io/ublue-os/akmods-nvidia-open"
 mkdir -p /tmp/akmods-policy/registries.d
 cat >/tmp/akmods-policy/policy.json <<EOF
@@ -85,13 +71,18 @@ echo "::group:: Install the driver"
 # implementation nvidia-install.sh expects.
 dnf5 config-manager setopt excludepkgs=golang-github-nvidia-container-toolkit
 
-# nvidia-install.sh reads these. IMAGE_NAME selects base-specific extras and has
-# to stay the base name, not the fork name.
+# The installer expects the base family, not the derived image name.
 rpm --import "https://download.copr.fedorainfracloud.org/results/ublue-os/staging/pubkey.gpg"
-IMAGE_NAME="${BASE_IMAGE_NAME}" \
+IMAGE_NAME="${BASE_IMAGE_NAME%-main}" \
 	AKMODNV_PATH=/tmp/akmods-rpms \
 	MULTILIB=0 \
 	/tmp/akmods-rpms/ublue-os/nvidia-install.sh
+
+KERNEL_VERSION="$(rpm -q --queryformat='%{VERSION}-%{RELEASE}.%{ARCH}' kernel-core)"
+export DRACUT_NO_XATTR=1
+dracut --no-hostonly --kver "${KERNEL_VERSION}" --reproducible --add ostree \
+	-f "/usr/lib/modules/${KERNEL_VERSION}/initramfs.img"
+chmod 0600 "/usr/lib/modules/${KERNEL_VERSION}/initramfs.img"
 
 # Mesa's nouveau Vulkan driver would otherwise advertise a device the NVIDIA
 # driver already owns.

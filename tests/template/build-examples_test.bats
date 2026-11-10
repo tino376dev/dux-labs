@@ -14,6 +14,8 @@
 BUILD_DIR="${BATS_TEST_DIRNAME}/../../build"
 README="${BUILD_DIR}/README.md"
 CLEANUP="${BUILD_DIR}/90-cleanup.sh"
+CONTAINERFILE="${BATS_TEST_DIRNAME}/../../Containerfile"
+NVIDIA_SCRIPT="${BUILD_DIR}/50-nvidia.sh"
 
 _examples() {
     find "${BUILD_DIR}" -maxdepth 1 -type f -name '*.sh.example' | sort
@@ -128,6 +130,25 @@ setup() {
     grep -qF "90-cleanup.sh also disables tailscale.repo" \
         "${BUILD_DIR}/30-tailscale.sh.example"
     grep -qE '^for repo_name in .*[[:space:]]tailscale([[:space:]]|;)' "${CLEANUP}"
+}
+
+@test "NVIDIA drivers are an active build phase before native apps" {
+    [ -x "${NVIDIA_SCRIPT}" ]
+    [ ! -f "${BUILD_DIR}/50-nvidia.sh.example" ]
+
+    local nvidia_line native_apps_line
+    nvidia_line="$(grep -nF '/ctx/build/50-nvidia.sh' "${CONTAINERFILE}" | cut -d: -f1)"
+    native_apps_line="$(grep -nF '/ctx/build/30-native-apps.sh' "${CONTAINERFILE}" | cut -d: -f1)"
+    [ -n "${nvidia_line}" ]
+    [ -n "${native_apps_line}" ]
+    [ "${nvidia_line}" -lt "${native_apps_line}" ]
+}
+
+@test "NVIDIA build uses signed kernel-matched modules and rebuilds initramfs" {
+    grep -qF 'skopeo --policy /tmp/akmods-policy/policy.json' "${NVIDIA_SCRIPT}"
+    grep -qF 'AKMODS_TAG="${AKMODS_FLAVOR}-$(rpm -E %fedora)-$(rpm -q kernel-core' "${NVIDIA_SCRIPT}"
+    grep -qF 'IMAGE_NAME="${BASE_IMAGE_NAME%-main}"' "${NVIDIA_SCRIPT}"
+    grep -qF 'dracut --no-hostonly --kver "${KERNEL_VERSION}" --reproducible --add ostree' "${NVIDIA_SCRIPT}"
 }
 
 @test "shellcheck is clean on every example" {

@@ -52,19 +52,16 @@ the repository name.
 
 ## Pinning
 
-Every OCI reference is pinned by digest and updated by Renovate: the base image,
-`projectbluefin/common`, `ublue-os/brew`, `bootc-image-builder`, and the GitHub
-Actions. Do not hand-edit a digest; let Renovate propose it.
+OCI references are pinned by digest and updated by Renovate, including
+`projectbluefin/common`, `ublue-os/brew`, `base-main`, `bootc-image-builder`,
+and the GitHub Actions. Do not hand-edit those digests; let Renovate propose
+them. The `base-main` numeric tag selects the Fedora major, and its digest
+updates within that major are automated.
 
-Exception: the base image's Fedora major (the final `FROM
-quay.io/fedora-ostree-desktops/silverblue:N` in `Containerfile`) is *not*
-updated by Renovate. The `packageRules` entry in `.github/renovate.json` that
-matches `matchDepNames: ["quay.io/fedora-ostree-desktops/*"]` with
-`matchUpdateTypes: ["major"]` sets `enabled: false`, so *no* major update is
-proposed for that namespace — including an already-released one such as
-44 -> 45. That is deliberate: the namespace also tags unreleased branches, and
-every major rebase is a manual step tied to a known-good validation. Bump the
-tag in `Containerfile` by hand when the next major is released and validated.
+The base image's Fedora major (`ghcr.io/ublue-os/base-main:N` in `Containerfile`)
+is not updated by Renovate. Major updates are disabled so each major rebase is
+manual. Validate that UBlue publishes an NVIDIA akmods image for the new base
+kernel before changing the tag.
 
 The base image's `FROM` line is the only place the base is chosen, so the Fedora
 major cannot desync the way a hand-maintained `FEDORA_MAJOR_VERSION` ARG could.
@@ -83,8 +80,13 @@ value, so build through `just`; a bare `podman build .` is unsupported.
 `.example` and add a `RUN` block after the package phase.
 [build/README.md](../../../build/README.md) has the block to copy.
 
-`50-nvidia.sh.example` pulls `ghcr.io/ublue-os/akmods-nvidia-open` through a
+`50-nvidia.sh` pulls `ghcr.io/ublue-os/akmods-nvidia-open` through a
 `skopeo` policy that accepts only images signed by `build/akmods-cosign.pub`, a
 copy of [ublue-os/akmods `cosign.pub`](https://github.com/ublue-os/akmods/blob/main/cosign.pub).
 If upstream rotates that key, update the copy; do not weaken the policy to
 `insecureAcceptAnything` to get a build through.
+
+The active NVIDIA phase uses that installer on `base-main`, then rebuilds the
+initramfs. The akmods tag must match the base kernel exactly. On installed
+systems with Secure Boot enabled, the UBlue kernel-signing MOK must be enrolled;
+this is separate from verifying the akmods OCI signature during the build.

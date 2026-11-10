@@ -11,6 +11,7 @@ prefix auto-discovery. The numbers communicate intent.
 | `00-image-info.sh` | Writes image identity into `os-release` and `image-info.json` early, then writes the version into `os-release` after package installation. |
 | `10-overlay.sh` | Overlays `projectbluefin/common`'s shared layer and the Brew integration, copies this template's declarations (Brewfiles, ujust recipes, Flatpak preinstalls, `/etc/skel` seeds), and enables the units that consume them. Installs no packages. |
 | `20-packages-and-services.sh` | Installs the default RPM and COPR packages and enables their services. Packages live here, not in the overlay phase, so an overlay edit cannot invalidate the package layer. |
+| `50-nvidia.sh` | Installs NVIDIA open drivers and CDI support from the signed akmods image matching the base kernel, then rebuilds the initramfs. |
 | `30-native-apps.sh` | Installs the native Edge, Zen Browser, and VS Code RPMs. Their RPM metadata lets the rechunker identify each app as a package component. |
 | `40-niri-dms.sh` | Installs Niri, the Dux Modular Shell stack, and Dux Files as the default folder manager, plus greetd, portals, and desktop support packages. |
 
@@ -29,8 +30,13 @@ Inactive until you activate them:
 
 - `30-tailscale.sh.example` — a third-party RPM repository done safely
 - `40-gnome-extensions.sh.example` — GNOME Shell extensions with a dconf override
-- `50-nvidia.sh.example` — NVIDIA drivers and CDI container support
 - `60-desktop-swap.sh.example` — replacing the GNOME desktop
+
+NVIDIA support is active in the Containerfile. It uses UBlue's signed
+`nvidia-open` akmods image for the base image's exact kernel. After installing
+the image, Secure Boot users should run `ujust enroll-secure-boot-key` if the
+UBlue kernel-signing key is not already enrolled, then complete enrollment at
+reboot.
 
 To activate one, rename it off `.example` and add a `RUN` block to the
 Containerfile after the package phase and before the cleanup phase. Copy the
