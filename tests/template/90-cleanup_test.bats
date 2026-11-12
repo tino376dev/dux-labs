@@ -96,9 +96,10 @@ run_cleanup() {
 	[ "$status" -eq 0 ]
 
 	mapfile -t calls <"${DNF5_LOG}"
-	[ "${#calls[@]}" -eq 2 ]
+	[ "${#calls[@]}" -eq 3 ]
 	[ "${calls[0]}" = "config-manager unsetopt keepcache install_weak_deps" ]
 	[ "${calls[1]}" = "versionlock clear" ]
+	[ "${calls[2]}" = "config-manager setopt fedora-multimedia.enabled=0" ]
 }
 
 @test "90-cleanup: disables and masks the fedora flatpak service and the base updater" {

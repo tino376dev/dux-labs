@@ -22,6 +22,7 @@ echo "::group:: Finalise package repositories"
 # so packages installed on top of the image still pull in weak dependencies.
 dnf5 config-manager unsetopt keepcache install_weak_deps
 dnf5 versionlock clear
+dnf5 config-manager setopt fedora-multimedia.enabled=0
 
 # Disable every third-party repository. copr_install_isolated already disables
 # each COPR it uses; this is the backstop for anything else the build enabled.
