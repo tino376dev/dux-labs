@@ -34,6 +34,10 @@ Zen's RPM installs there; leaving `/opt` linked to `/var/opt` would put its
 payload in mutable state, which cleanup removes and bootc does not deploy as
 image content. Do not restore the `/var/opt` symlink after installing packages.
 
+DNF5 repository overrides can enable a repository even when its `.repo` file
+disables it. Cleanup explicitly disables `fedora-multimedia` with
+`dnf5 config-manager setopt` so the image's effective configuration is disabled.
+
 ## The Justfile
 
 ```bash
