@@ -26,6 +26,10 @@ description: >-
 
 Most are thin callers of reusable workflows in `projectbluefin/actions`.
 
+`pr-validation.yml` pins Ubuntu 24.04 because `validate-pr` installs
+`shellcheck=0.9.0-1`, a package version unavailable on Ubuntu 26.04.
+Revisit the pin when the shared action supports newer runners.
+
 ## The release model
 
 `main` publishes `:stable-testing`. `stable` never rebuilds: promotion is a
