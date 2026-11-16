@@ -79,7 +79,7 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
 
 **Build system**
 
-- A build on every push to `main`, publishing `:stable-testing`
+- A build on every push to `main` and weekly, publishing `:stable-testing`
 - Renovate through `projectbluefin/actions`, updating pinned actions and image
   digests every six hours
 - Images older than 90 days pruned automatically
