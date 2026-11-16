@@ -15,7 +15,8 @@ permissions: {}
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    # validate-pr installs the Ubuntu 24.04 shellcheck package by exact version.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       # The promotion check below reads refs and commits through the API.
