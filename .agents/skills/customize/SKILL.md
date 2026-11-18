@@ -32,6 +32,7 @@ phase map.
 
 Prefer a package the base already ships. When a COPR is unavoidable,
 `copr_install_isolated` enables and disables it for you.
+Fedora packages the Qt 6 KImageFormats plugins as `kf6-kimageformats`.
 
 ### Homebrew
 

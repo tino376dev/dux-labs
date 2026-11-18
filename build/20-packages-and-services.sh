@@ -18,6 +18,7 @@ set -euo pipefail
 #   podman-docker   - provides the docker command as a Podman wrapper
 #   openfortivpn, ppp - VPN client and PPP support
 #   adw-gtk3-theme, qt6ct - GTK 3 theme and Qt 6 appearance configuration
+#   kf6-kimageformats - additional Qt 6 image format plugins
 #   uupd  - background update policy, from the ublue-os/packages COPR
 ###############################################################################
 
@@ -36,7 +37,7 @@ if rpm -q firefox >/dev/null 2>&1; then
 	echo "::endgroup::"
 fi
 
-dnf5 install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp adw-gtk3-theme qt6ct
+dnf5 install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp adw-gtk3-theme qt6ct kf6-kimageformats
 
 echo "::endgroup::"
 
