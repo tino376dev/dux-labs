@@ -43,6 +43,9 @@ Homebrew-installed `gcc` does not replace that host prerequisite. Put those
 requirements in the image package phase when the image is expected to support
 Homebrew source builds.
 
+Desktop appearance integration also belongs in the image package phase:
+`adw-gtk3-theme` and `qt6ct` are RPMs, not Flatpak application declarations.
+
 ### Flatpak
 
 Preinstall declarations in `custom/flatpaks/`. The app must exist on Flathub;
