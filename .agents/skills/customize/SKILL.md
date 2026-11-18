@@ -32,6 +32,7 @@ phase map.
 
 Prefer a package the base already ships. When a COPR is unavoidable,
 `copr_install_isolated` enables and disables it for you.
+Fedora packages the Qt 6 KImageFormats plugins as `kf6-kimageformats`.
 
 ### Homebrew
 
@@ -42,6 +43,9 @@ On Linux, Homebrew also requires a system C compiler and development tools; a
 Homebrew-installed `gcc` does not replace that host prerequisite. Put those
 requirements in the image package phase when the image is expected to support
 Homebrew source builds.
+
+Desktop appearance integration also belongs in the image package phase:
+`adw-gtk3-theme` and `qt6ct` are RPMs, not Flatpak application declarations.
 
 ### Flatpak
 

@@ -84,7 +84,7 @@ teardown() {
 	[ "$status" -eq 0 ]
 
 	mapfile -t calls <"${DNF5_LOG}"
-	[ "${calls[0]}" = "install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp" ]
+	[ "${calls[0]}" = "install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp adw-gtk3-theme qt6ct kf6-kimageformats" ]
 }
 
 @test "20-packages-and-services: installs Homebrew's Linux build requirements" {
@@ -102,7 +102,7 @@ teardown() {
 
 	mapfile -t calls <"${DNF5_LOG}"
 	[ "${calls[0]}" = "remove -y firefox" ]
-	[ "${calls[1]}" = "install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp" ]
+	[ "${calls[1]}" = "install -y just gum fzf jq podman-compose podman-docker openfortivpn ppp adw-gtk3-theme qt6ct kf6-kimageformats" ]
 }
 
 @test "20-packages-and-services: installs uupd from its COPR in isolation" {
