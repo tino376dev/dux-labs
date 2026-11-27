@@ -151,6 +151,59 @@ setup() {
     grep -qF 'dracut --no-hostonly --kver "${KERNEL_VERSION}" --reproducible --add ostree' "${NVIDIA_SCRIPT}"
 }
 
+_prepare_nvidia_initramfs_test() {
+    export NVIDIA_TEST_ROOT="${BATS_TEST_TMPDIR}"
+    mkdir -p "${NVIDIA_TEST_ROOT}/bin" "${NVIDIA_TEST_ROOT}/modules"
+    # Run only the rebuild section, with its output confined to the test root.
+    sed -n '/^KERNEL_VERSION=/,/^chmod 0600/p' "${NVIDIA_SCRIPT}" |
+        sed "s#/usr/lib/modules/#${NVIDIA_TEST_ROOT}/modules/#g" \
+        >"${NVIDIA_TEST_ROOT}/rebuild.sh"
+    [ -s "${NVIDIA_TEST_ROOT}/rebuild.sh" ]
+
+    cat >"${NVIDIA_TEST_ROOT}/bin/rpm" <<'EOF'
+#!/usr/bin/env bash
+printf 'test-kernel\n'
+EOF
+    cat >"${NVIDIA_TEST_ROOT}/bin/dnf5" <<'EOF'
+#!/usr/bin/env bash
+if [[ "${FAIL_ZSTD_UPGRADE:-0}" == "1" ]]; then
+    echo "zstd upgrade failed" >&2
+    exit 1
+fi
+if [[ "$1" == "upgrade" && " $* " == *" zstd "* && " $* " == *" libzstd "* ]]; then
+    touch "${NVIDIA_TEST_ROOT}/zstd-aligned"
+fi
+EOF
+    cat >"${NVIDIA_TEST_ROOT}/bin/dracut" <<'EOF'
+#!/usr/bin/env bash
+touch "${NVIDIA_TEST_ROOT}/dracut-called"
+if [[ ! -f "${NVIDIA_TEST_ROOT}/zstd-aligned" ]]; then
+    echo "incorrect library version" >&2
+    exit 1
+fi
+mkdir -p "$(dirname "${@: -1}")"
+printf 'initramfs\n' >"${@: -1}"
+EOF
+    chmod +x "${NVIDIA_TEST_ROOT}/bin/rpm" \
+        "${NVIDIA_TEST_ROOT}/bin/dnf5" "${NVIDIA_TEST_ROOT}/bin/dracut"
+    export PATH="${NVIDIA_TEST_ROOT}/bin:${PATH}"
+}
+
+@test "NVIDIA rebuild aligns zstd before compressing the initramfs" {
+    _prepare_nvidia_initramfs_test
+    run bash -euo pipefail "${NVIDIA_TEST_ROOT}/rebuild.sh"
+    [ "${status}" -eq 0 ]
+    [ -s "${NVIDIA_TEST_ROOT}/modules/test-kernel/initramfs.img" ]
+}
+
+@test "NVIDIA rebuild stops when zstd package alignment fails" {
+    _prepare_nvidia_initramfs_test
+    FAIL_ZSTD_UPGRADE=1 run bash -euo pipefail "${NVIDIA_TEST_ROOT}/rebuild.sh"
+    [ "${status}" -ne 0 ]
+    [[ "${output}" == *"zstd upgrade failed"* ]]
+    [ ! -e "${NVIDIA_TEST_ROOT}/dracut-called" ]
+}
+
 @test "shellcheck is clean on every example" {
     # `just lint` cannot reach these files: its scope is `git ls-files '*.sh'`.
     command -v shellcheck >/dev/null || skip "shellcheck is not installed"

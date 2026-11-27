@@ -95,6 +95,11 @@ If upstream rotates that key, update the copy; do not weaken the policy to
 `insecureAcceptAnything` to get a build through.
 
 The active NVIDIA phase uses that installer on `base-main`, then rebuilds the
-initramfs. The akmods tag must match the base kernel exactly. On installed
+initramfs. Upgrade `zstd` and `libzstd` together before running dracut: earlier
+package transactions can upgrade only the library, and the old zstd CLI rejects
+the newer runtime library even though its shared-library ABI is compatible.
+Keep the pair current rather than pinning or downgrading the library.
+
+The akmods tag must match the base kernel exactly. On installed
 systems with Secure Boot enabled, the UBlue kernel-signing MOK must be enrolled;
 this is separate from verifying the akmods OCI signature during the build.
