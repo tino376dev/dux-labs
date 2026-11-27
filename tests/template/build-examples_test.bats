@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 # Tests for the inactive build examples: build/*.sh.example.
 #
-# These four files are the only shell in the repository that nothing else
+# These files are the only shell in the repository that nothing else
 # checks. `just lint` and pr-validation.yml both resolve their scope from
 # `git ls-files '*.sh'`, which does not match a `.sh.example` suffix, and the
 # Containerfile never runs them. A contributor activates one by renaming it,
@@ -124,11 +124,11 @@ setup() {
 }
 
 @test "90-cleanup.sh still disables tailscale.repo as the documented backstop" {
-    # 30-tailscale.sh.example tells the reader that 90-cleanup.sh disables
+    # 30-tailscale.sh tells the reader that 90-cleanup.sh disables
     # tailscale.repo as a backstop. Dropping tailscale from that loop makes the
-    # example's promise false without touching the example.
+    # phase's promise false without touching the phase.
     grep -qF "90-cleanup.sh also disables tailscale.repo" \
-        "${BUILD_DIR}/30-tailscale.sh.example"
+        "${BUILD_DIR}/30-tailscale.sh"
     grep -qE '^for repo_name in .*[[:space:]]tailscale([[:space:]]|;)' "${CLEANUP}"
 }
 

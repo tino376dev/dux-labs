@@ -84,6 +84,10 @@ value, so build through `just`; a bare `podman build .` is unsupported.
 `.example` and add a `RUN` block after the package phase.
 [build/README.md](../../../build/README.md) has the block to copy.
 
+`30-tailscale.sh` is active: it installs the RPM from `tailscale-stable`,
+removes the vendor repository, and enables `tailscaled.service`. Do not join a
+tailnet during image assembly; users authenticate with `sudo tailscale up`.
+
 `50-nvidia.sh` pulls `ghcr.io/ublue-os/akmods-nvidia-open` through a
 `skopeo` policy that accepts only images signed by `build/akmods-cosign.pub`, a
 copy of [ublue-os/akmods `cosign.pub`](https://github.com/ublue-os/akmods/blob/main/cosign.pub).

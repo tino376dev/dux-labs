@@ -13,13 +13,14 @@ prefix auto-discovery. The numbers communicate intent.
 | `20-packages-and-services.sh` | Installs the default RPM and COPR packages and enables their services. Packages live here, not in the overlay phase, so an overlay edit cannot invalidate the package layer. |
 | `50-nvidia.sh` | Installs NVIDIA open drivers and CDI support from the signed akmods image matching the base kernel, then rebuilds the initramfs. |
 | `30-native-apps.sh` | Installs the native Edge, Zen Browser, and VS Code RPMs. Their RPM metadata lets the rechunker identify each app as a package component. |
+| `30-tailscale.sh` | Installs Tailscale from its vendor RPM repository, removes the repository, and enables `tailscaled.service`. |
 | `40-niri-dms.sh` | Installs Niri, the Dux Modular Shell stack, and Dux Files as the default folder manager, plus greetd, portals, and desktop support packages. |
+| `90-cleanup.sh` | Finalises package and Flatpak sources, prunes build artifacts, and prepares for `bootc container lint`. |
 
 Dux Files' open/save portal chooser is available but remains a per-user opt-in:
 enable it in Settings → General → Use Dux Files for open and save dialogs, or
 run `dfiles portal install`. The existing portal backends stay installed for
 other portal interfaces.
-| `90-cleanup.sh` | Finalises package and Flatpak sources, prunes build artifacts, and prepares for `bootc container lint`. |
 
 Helpers, not phases: `copr-helpers.sh` (sourced), `validate-brewfiles.sh`, and
 `validate-flatpaks.sh` (called by the Justfile and CI).
@@ -28,7 +29,6 @@ Helpers, not phases: `copr-helpers.sh` (sourced), `validate-brewfiles.sh`, and
 
 Inactive until you activate them:
 
-- `30-tailscale.sh.example` — a third-party RPM repository done safely
 - `40-gnome-extensions.sh.example` — GNOME Shell extensions with a dconf override
 - `60-desktop-swap.sh.example` — replacing the GNOME desktop
 
