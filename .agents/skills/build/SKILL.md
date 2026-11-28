@@ -84,6 +84,10 @@ value, so build through `just`; a bare `podman build .` is unsupported.
 `.example` and add a `RUN` block after the package phase.
 [build/README.md](../../../build/README.md) has the block to copy.
 
+`30-tailscale.sh` is active: it installs the RPM from `tailscale-stable`,
+removes the vendor repository, and enables `tailscaled.service`. Do not join a
+tailnet during image assembly; users authenticate with `sudo tailscale up`.
+
 `50-nvidia.sh` pulls `ghcr.io/ublue-os/akmods-nvidia-open` through a
 `skopeo` policy that accepts only images signed by `build/akmods-cosign.pub`, a
 copy of [ublue-os/akmods `cosign.pub`](https://github.com/ublue-os/akmods/blob/main/cosign.pub).
@@ -91,6 +95,11 @@ If upstream rotates that key, update the copy; do not weaken the policy to
 `insecureAcceptAnything` to get a build through.
 
 The active NVIDIA phase uses that installer on `base-main`, then rebuilds the
-initramfs. The akmods tag must match the base kernel exactly. On installed
+initramfs. Upgrade `zstd` and `libzstd` together before running dracut: earlier
+package transactions can upgrade only the library, and the old zstd CLI rejects
+the newer runtime library even though its shared-library ABI is compatible.
+Keep the pair current rather than pinning or downgrading the library.
+
+The akmods tag must match the base kernel exactly. On installed
 systems with Secure Boot enabled, the UBlue kernel-signing MOK must be enrolled;
 this is separate from verifying the akmods OCI signature during the build.

@@ -27,6 +27,7 @@ CI runs the same checks; running them locally only makes the pull request quiet.
 | a third-party repository is live in the final image | a script enabled it and did not disable it | use `copr_install_isolated`, or disable it explicitly |
 | the package layer rebuilds on every overlay edit | packages drifted into the overlay phase | keep packages in `20-packages-and-services.sh` |
 | Zen's launcher exists but `/opt/zen/zen-bin` is missing | Zen was installed under `/var/opt`, which image cleanup removes | make `/opt` a real directory before installing packages and rebuild the image |
+| NVIDIA initramfs generation reports `incorrect library version` from zstd | a package transaction upgraded `libzstd` without the zstd CLI | upgrade `zstd` and `libzstd` together before dracut; see the build skill |
 | hadolint flags the Containerfile | a rule in `.github/hadolint.yaml` | fix it, or add a suppression with a reason |
 
 ## CI

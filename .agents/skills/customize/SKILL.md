@@ -39,6 +39,8 @@ Fedora packages the Qt 6 KImageFormats plugins as `kf6-kimageformats`.
 Add Homebrew formulae to the single `custom/brew/default.Brewfile`; the
 `install-default-apps` recipe installs the complete list.
 [custom/brew/README.md](../../../custom/brew/README.md) has the format.
+For Fedora's Bash, use `bash-completion@2`; Homebrew's unversioned
+`bash-completion` targets Bash 3.2 and the newer formula requires shell setup.
 On Linux, Homebrew also requires a system C compiler and development tools; a
 Homebrew-installed `gcc` does not replace that host prerequisite. Put those
 requirements in the image package phase when the image is expected to support

@@ -79,6 +79,8 @@ IMAGE_NAME="${BASE_IMAGE_NAME%-main}" \
 	/tmp/akmods-rpms/ublue-os/nvidia-install.sh
 
 KERNEL_VERSION="$(rpm -q --queryformat='%{VERSION}-%{RELEASE}.%{ARCH}' kernel-core)"
+# Package transactions can upgrade libzstd without its version-sensitive CLI.
+dnf5 upgrade -y zstd libzstd
 export DRACUT_NO_XATTR=1
 dracut --no-hostonly --kver "${KERNEL_VERSION}" --reproducible --add ostree \
 	-f "/usr/lib/modules/${KERNEL_VERSION}/initramfs.img"
