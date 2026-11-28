@@ -9,6 +9,10 @@ installed at build time.
 `default.Brewfile` contains all optional Homebrew formulae, including
 development tools. Install them with `ujust install-default-apps`.
 
+The `bash-completion@2` formula requires shell setup after installation; run
+`brew info bash-completion@2` for the activation instructions. For Flyline
+shell integration, see the [Flyline documentation](https://github.com/HalFrgrd/flyline).
+
 The image also ships `/usr/share/ublue-os/homebrew/fonts.Brewfile`, a curated
 font set from Common's shared layer, so this directory does not need its own.
 

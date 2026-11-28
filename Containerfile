@@ -36,8 +36,8 @@
 
 # OCI context images - imported below and pinned directly in their FROM lines.
 # Shared OCI layers are pinned in their FROM lines and updated by Renovate.
-FROM ghcr.io/projectbluefin/common:latest@sha256:a41b53eedc6fc22ecc771c438c2f3d9c32600401d9f2bd9490b2ee3e146e175e AS common
-FROM ghcr.io/ublue-os/brew:latest@sha256:9e0492dbc471258657564c94dae18b58dd96ddb998a06f2b15e8209efb48042b AS brew
+FROM ghcr.io/projectbluefin/common:latest@sha256:e702c2b00ebf59b12facc607b1c721b2424994f59d56ebc7a4658767fa5f7b74 AS common
+FROM ghcr.io/ublue-os/brew:latest@sha256:9c51c948d48de69b0fadfb3d97dc1a7eaa91a4e5a2af7b2b6626fdd8fca362b1 AS brew
 
 # Context stage - combine local and imported OCI container resources
 FROM scratch AS ctx
@@ -51,7 +51,7 @@ COPY --from=brew /system_files /oci/brew
 
 # Base Image - UBlue's minimal base, held to Fedora 45. Renovate advances the
 # digest within this major; NVIDIA support uses matching signed akmods below.
-FROM ghcr.io/ublue-os/base-main:45@sha256:8e491a4840fe1374e3961fe186a15586726268d44a3648c0144258d5232b2a04
+FROM ghcr.io/ublue-os/base-main:45@sha256:cf6a02954e5a2dd0eb8a188f4af1cad02e17488318bfe57dc9d56d5aa275ea48
 
 # Image identity - these define how bootc, fastfetch, and the ublue ecosystem
 # recognize your image. Change these to match your project name.
@@ -122,6 +122,15 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build/30-native-apps.sh
+
+### TAILSCALE
+## Installs the vendor RPM and enables the daemon without joining a tailnet.
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=tmpfs,dst=/boot \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/30-tailscale.sh
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/cache/libdnf5 \

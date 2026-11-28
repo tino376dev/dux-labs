@@ -25,16 +25,18 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
   provides the `docker` command as a Podman wrapper.
 - Native RPM applications: Microsoft Edge, Zen Browser, Zed, and Visual Studio
   Code.
+- Tailscale, with its daemon enabled.
 - NVIDIA open kernel modules and container-device support, signed for Secure
   Boot with the UBlue kernel-signing key.
 
 ### Optional applications
 
-- **Homebrew applications:** azure-cli, bat, bats-core, carapace, databricks,
-  dprint, dust, eza, fd, fish, gh, git-delta, glow, helix, markdown-oxide,
-  marksman, micro, numbat, nushell, ripgrep, ruff, shellcheck,
-  starship, tinymist, topiary, typst, vivid, vscode-langservers-extracted,
-  yazi, and zoxide. Install with `ujust install-default-apps`.
+- **Homebrew applications:** azure-cli, bash-completion@2, bat, bats-core,
+  carapace, databricks, dprint, dust, eza, fd, fish, flyline, gh, git-delta,
+  glow, helix, markdown-oxide, marksman, micro, numbat, nushell, ripgrep, ruff,
+  shellcheck, starship, tinymist, topiary, typst, vivid,
+  vscode-langservers-extracted, yazi, and zoxide. Install with
+  `ujust install-default-apps`.
 - **Flatpaks installed on first boot:** Logseq, Remmina, Signal, Thunderbird,
   Flatseal, and Extension Manager.
 
@@ -57,6 +59,22 @@ image. It adds a Niri desktop with Dux Modular Shell and its companion apps.
   HEIF/AVIF/JXL, and Office files; PDF previews; DMS audio visualization and
   sound feedback; persistent profile details; and DDC monitor brightness
   controls. Video support depends on Fedora's available codecs.
+
+### Tailscale
+
+After booting the image, run `sudo tailscale up` and follow the login URL to
+connect to your tailnet. The daemon starts automatically, and Tailscale updates
+come from image builds rather than a runtime RPM repository.
+
+If you previously enabled the Homebrew Tailscale service, stop it before
+switching to this image so the two daemons do not compete:
+
+```bash
+sudo --preserve-env=HOME brew services stop tailscale
+```
+
+You can then uninstall the Homebrew formula with `brew uninstall tailscale` to
+use the image's Tailscale CLI.
 
 ## Quick start
 
