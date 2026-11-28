@@ -51,7 +51,7 @@ COPY --from=brew /system_files /oci/brew
 
 # Base Image - UBlue's minimal base, held to Fedora 45. Renovate advances the
 # digest within this major; NVIDIA support uses matching signed akmods below.
-FROM ghcr.io/ublue-os/base-main:45@sha256:cbcb3ea1b82dd92a0fdb0cd80b12292e1676a1f070cfbd0d10ef1ca487db1a71
+FROM ghcr.io/ublue-os/base-main:45@sha256:cf6a02954e5a2dd0eb8a188f4af1cad02e17488318bfe57dc9d56d5aa275ea48
 
 # Image identity - these define how bootc, fastfetch, and the ublue ecosystem
 # recognize your image. Change these to match your project name.
